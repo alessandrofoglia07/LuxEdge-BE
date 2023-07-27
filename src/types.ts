@@ -19,6 +19,18 @@ export interface IProductDocument extends Document {
     price: number;
     imagePath: string;
     tags: string[];
+    sold: number;
+    available: boolean;
+    reviews: ObjectId[];
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface IReviewDocument extends Document {
+    productId: ObjectId;
+    userId: ObjectId;
+    rating: number;
+    comment: string;
     createdAt: Date;
     updatedAt: Date;
 }

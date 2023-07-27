@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import Product from '../models/product.js';
-import path from 'path';
 
 const router = Router();
 
