@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import filter from 'leo-profanity';
+import { detect } from 'curse-filter';
 
 const bannedUsernames = ['post', 'comment', 'admin', 'administrator', 'moderator', 'mod', 'user', 'users'];
 
@@ -10,7 +10,7 @@ const checkCredentials = (req: Request, res: Response, next: NextFunction) => {
 
     const { username, email, password } = req.body;
 
-    if (bannedUsernames.includes(username) || username.includes('*') || filter.check(username)) return res.status(400).json({ message: 'Username not allowed' });
+    if (bannedUsernames.includes(username) || username.includes('*') || detect(username)) return res.status(400).json({ message: 'Username not allowed' });
     if (!username || !email || !password) return res.status(400).json({ message: 'All fields required' });
     if (username.length < 3 || username.length > 20) return res.status(400).json({ message: 'Username must be 3-20 characters long' });
     if (password.length < 6 || password.length > 16) return res.status(400).json({ message: 'Password must be 6-16 characters long' });

@@ -1,10 +1,10 @@
-import filter from 'leo-profanity';
+import { detect } from 'curse-filter';
 const bannedUsernames = ['post', 'comment', 'admin', 'administrator', 'moderator', 'mod', 'user', 'users'];
 /** Check if username, email and password are valid */
 const checkCredentials = (req, res, next) => {
     const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     const { username, email, password } = req.body;
-    if (bannedUsernames.includes(username) || username.includes('*') || filter.check(username))
+    if (bannedUsernames.includes(username) || username.includes('*') || detect(username))
         return res.status(400).json({ message: 'Username not allowed' });
     if (!username || !email || !password)
         return res.status(400).json({ message: 'All fields required' });
