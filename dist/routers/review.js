@@ -8,13 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Router } from "express";
+import { toObjectId } from "../types.js";
 import Review from "../models/review.js";
 import Product from "../models/product.js";
 import checkActive from "../middlewares/checkActive.js";
 import checkUser from "../middlewares/checkUser.js";
 const router = Router();
-router.use([checkUser, checkActive]);
-router.post('/add/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/add/:id', checkUser, checkActive, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { rating, comment } = req.body;
     const user = req.user;
@@ -46,6 +46,18 @@ router.get('/getReviews/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
             return res.status(404).json({ message: 'Product not found' });
         const reviews = yield Review.find({ productId: product._id }).populate('userId', 'username');
         return res.json({ reviews });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}));
+router.get('/getScore/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    try {
+        const reviews = yield Review.find({ productId: toObjectId(id) });
+        const score = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+        return res.json({ score });
     }
     catch (err) {
         console.log(err);

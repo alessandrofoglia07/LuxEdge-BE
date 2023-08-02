@@ -1,6 +1,13 @@
 import { Request } from "express";
 import mongoose, { ObjectId, Document } from "mongoose";
 
+export type ObjectIdConstructor = {
+    (str: string): ObjectId;
+    new(str: string): ObjectId;
+};
+
+export const toObjectId = (str: string): ObjectId => new (mongoose.Types.ObjectId as unknown as ObjectIdConstructor)(str);
+
 export interface IUserDocument extends Document {
     email: string;
     username: string;

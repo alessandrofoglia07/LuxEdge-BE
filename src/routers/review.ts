@@ -1,5 +1,5 @@
-import { Router, Response } from "express";
-import { AuthRequest } from "../types.js";
+import { Router, Response, Request } from "express";
+import { AuthRequest, toObjectId } from "../types.js";
 import Review from "../models/review.js";
 import Product from "../models/product.js";
 import checkActive from "../middlewares/checkActive.js";
@@ -7,9 +7,7 @@ import checkUser from "../middlewares/checkUser.js";
 
 const router = Router();
 
-router.use([checkUser, checkActive]);
-
-router.post('/add/:id', async (req: AuthRequest, res: Response) => {
+router.post('/add/:id', checkUser, checkActive, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { rating, comment } = req.body;
     const user = req.user!;
@@ -45,6 +43,19 @@ router.get('/getReviews/:id', async (req: AuthRequest, res: Response) => {
 
         const reviews = await Review.find({ productId: product._id }).populate('userId', 'username');
         return res.json({ reviews });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.get('/getScore/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const reviews = await Review.find({ productId: toObjectId(id) });
+        const score = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+        return res.json({ score });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: 'Internal server error' });

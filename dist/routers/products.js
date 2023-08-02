@@ -20,7 +20,14 @@ const randomSort = (arr) => {
 // get random products
 router.get('/suggested', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const limit = req.query.limit ? Number(req.query.limit) : 10;
-    const products = yield Product.find({}).limit(limit);
+    const products = yield Product.aggregate([
+        { $match: {} },
+        { $limit: limit },
+        { $lookup: { from: 'reviews', localField: '_id', foreignField: 'productId', as: 'reviews' } },
+        { $addFields: { rawScore: { $avg: '$reviews.rating' } } },
+        { $addFields: { score: { $round: ['$rawScore', 2] } }, },
+        { $unset: ['reviews', 'rawScore'] }
+    ]);
     if (!products)
         return res.sendStatus(404);
     const randomProducts = randomSort(products);
@@ -34,12 +41,23 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const limit = req.query.limit ? Number(req.query.limit) : 10;
     const page = req.query.page ? Number(req.query.page) : 1;
     const skip = (page - 1) * limit;
-    const products = yield Product.find({
-        $and: [
-            { name: { $regex: query, $options: 'i' } },
-            { tags: { $in: tags } }
-        ]
-    }).limit(limit).skip(skip).sort({ createdAt: -1 });
+    const products = yield Product.aggregate([
+        {
+            $match: {
+                $and: [
+                    { name: { $regex: query, $options: 'i' } },
+                    { tags: { $in: tags } }
+                ]
+            }
+        },
+        { $limit: limit },
+        { $skip: skip },
+        { $lookup: { from: 'reviews', localField: '_id', foreignField: 'productId', as: 'reviews' } },
+        { $addFields: { rawScore: { $avg: '$reviews.rating' } } },
+        { $addFields: { score: { $round: ['$score', 2] } } },
+        { $unset: ['reviews', 'rawScore'] },
+        { $sort: { sold: -1 } }
+    ]);
     if (products === undefined)
         return res.sendStatus(404);
     res.json(products);
