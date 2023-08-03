@@ -110,10 +110,10 @@ router.patch('/removeFromFavorites/:id', async (req: AuthRequest, res: Response)
 });
 
 // get favorites
-router.get('/favorites', (req: AuthRequest, res: Response) => {
+router.get('/favorites', async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user!;
-        const favorites = Product.find({ _id: { $in: user.favorites } });
+        const favorites = await Product.find({ _id: { $in: user.favorites } });
         res.json(favorites);
     } catch (err) {
         console.log(err);

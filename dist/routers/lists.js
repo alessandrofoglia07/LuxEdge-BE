@@ -103,15 +103,15 @@ router.patch('/removeFromFavorites/:id', (req, res) => __awaiter(void 0, void 0,
     }
 }));
 // get favorites
-router.get('/favorites', (req, res) => {
+router.get('/favorites', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = req.user;
-        const favorites = Product.find({ _id: { $in: user.favorites } });
+        const favorites = yield Product.find({ _id: { $in: user.favorites } });
         res.json(favorites);
     }
     catch (err) {
         console.log(err);
         return res.status(500).json({ message: 'Internal server error' });
     }
-});
+}));
 export default router;
