@@ -14,9 +14,11 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-    origin: process.env.CLIENT_URL,
-}));
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL
+    })
+);
 app.use(express.json());
 
 app.use('/api/user', userRouter);
@@ -44,7 +46,7 @@ export const upload: any = multer({
         const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
         if (mimetype && extname) {
             return cb(null, true);
-        };
+        }
         cb(new Error('Error: Images only'));
     }
 }).single('image');

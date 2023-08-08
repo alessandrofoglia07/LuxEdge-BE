@@ -19,7 +19,7 @@ router.get('/suggested', async (req: Request, res: Response) => {
         { $limit: limit },
         { $lookup: { from: 'reviews', localField: '_id', foreignField: 'productId', as: 'reviews' } },
         { $addFields: { rawScore: { $avg: '$reviews.rating' } } },
-        { $addFields: { score: { $round: ['$rawScore', 2] } }, },
+        { $addFields: { score: { $round: ['$rawScore', 2] } } },
         { $unset: ['reviews', 'rawScore'] }
     ]);
     if (!products) return res.sendStatus(404);
@@ -31,7 +31,7 @@ router.get('/suggested', async (req: Request, res: Response) => {
 router.get('/search', async (req: Request, res: Response) => {
     const query = req.query.q ? String(req.query.q) : '';
     const tagsQuery = req.query.tags ? String(req.query.tags) : '';
-    const tags = tagsQuery.split(',').map(tag => tag.trim());
+    const tags = tagsQuery.split(',').map((tag) => tag.trim());
 
     const limit = req.query.limit ? Number(req.query.limit) : 10;
     const page = req.query.page ? Number(req.query.page) : 1;
@@ -40,10 +40,7 @@ router.get('/search', async (req: Request, res: Response) => {
     const products = await Product.aggregate([
         {
             $match: {
-                $and: [
-                    { name: { $regex: query, $options: 'i' } },
-                    { tags: { $in: tags } }
-                ]
+                $and: [{ name: { $regex: query, $options: 'i' } }, { tags: { $in: tags } }]
             }
         },
         { $limit: limit },

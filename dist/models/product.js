@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 const ProductSchema = new Schema({
     name: {
         type: String,
-        required: true,
+        required: true
     },
     description: {
         type: String,
@@ -10,7 +10,7 @@ const ProductSchema = new Schema({
     },
     price: {
         type: Number,
-        required: true,
+        required: true
     },
     imagePath: {
         type: String,
@@ -33,8 +33,8 @@ const ProductSchema = new Schema({
     },
     reviews: {
         type: [Schema.Types.ObjectId],
-        ref: "Review",
+        ref: 'Review',
         default: []
     }
 }, { timestamps: true });
-export default model("Product", ProductSchema);
+export default model('Product', ProductSchema);

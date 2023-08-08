@@ -37,7 +37,7 @@ router.patch('/removeFromCart/:id', async (req: AuthRequest, res: Response) => {
 
         const user = req.user!;
 
-        user.cart = user.cart.filter(productId => productId.toString() !== product._id.toString());
+        user.cart = user.cart.filter((productId) => productId.toString() !== product._id.toString());
         await user.save();
 
         res.json(user.cart);
@@ -72,7 +72,7 @@ router.get('/cart', async (req: AuthRequest, res: Response) => {
     }
 });
 
-// add to favorites 
+// add to favorites
 router.patch('/addToFavorites/:id', async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
@@ -99,7 +99,7 @@ router.patch('/removeFromFavorites/:id', async (req: AuthRequest, res: Response)
     try {
         const user = req.user!;
 
-        user.favorites = user.favorites.filter(productId => productId.toString() !== id);
+        user.favorites = user.favorites.filter((productId) => productId.toString() !== id);
         await user.save();
 
         res.json(user.favorites);

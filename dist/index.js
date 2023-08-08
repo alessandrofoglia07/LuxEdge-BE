@@ -21,7 +21,7 @@ import { v4 as uuidv4 } from 'uuid';
 dotenv.config();
 const app = express();
 app.use(cors({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.CLIENT_URL
 }));
 app.use(express.json());
 app.use('/api/user', userRouter);
@@ -48,7 +48,6 @@ export const upload = multer({
         if (mimetype && extname) {
             return cb(null, true);
         }
-        ;
         cb(new Error('Error: Images only'));
     }
 }).single('image');

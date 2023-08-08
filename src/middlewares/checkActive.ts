@@ -1,5 +1,5 @@
-import { Response, NextFunction } from "express";
-import { AuthRequest } from "../types.js";
+import { Response, NextFunction } from 'express';
+import { AuthRequest } from '../types.js';
 
 /** Check if user's account is active */
 const checkActive = (req: AuthRequest, res: Response, next: NextFunction) => {

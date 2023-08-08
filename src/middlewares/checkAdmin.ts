@@ -1,5 +1,5 @@
-import { Response, NextFunction } from "express";
-import { AuthRequest } from "../types.js";
+import { Response, NextFunction } from 'express';
+import { AuthRequest } from '../types.js';
 
 const checkAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
     if (req.user && req.user.role === 'admin') {

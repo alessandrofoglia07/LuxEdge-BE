@@ -1,24 +1,38 @@
 import { Request, Response, NextFunction } from 'express';
 import { detect } from 'curse-filter';
+import { z } from 'zod';
 
 const bannedUsernames = ['post', 'comment', 'admin', 'administrator', 'moderator', 'mod', 'user', 'users'];
 
 /** Check if username, email and password are valid */
 const checkCredentials = (req: Request, res: Response, next: NextFunction) => {
-
-    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-
     const { username, email, password } = req.body;
 
-    if (bannedUsernames.includes(username) || username.includes('*') || detect(username)) return res.status(400).json({ message: 'Username not allowed' });
-    if (!username || !email || !password) return res.status(400).json({ message: 'All fields required' });
-    if (username.length < 3 || username.length > 20) return res.status(400).json({ message: 'Username must be 3-20 characters long' });
-    if (password.length < 6 || password.length > 16) return res.status(400).json({ message: 'Password must be 6-16 characters long' });
-    if (username.includes(' ')) return res.status(400).json({ message: 'Username cannot contain spaces' });
-    if (email.includes(' ')) return res.status(400).json({ message: 'Email cannot contain spaces' });
-    if (password.includes(' ')) return res.status(400).json({ message: 'Password cannot contain spaces' });
+    const userLengthErr = 'Username must be 3-20 characters long';
+    const userCharsErr = 'Username cannot contain spaces or asterisks';
+    const userNotAllowedErr = 'Username not allowed';
 
-    if (!emailRegex.test(email)) return res.status(400).json({ message: 'Invalid email' });
+    const passLengthErr = 'Password must be 6-16 characters long';
+    const passCharsErr = 'Password cannot contain spaces';
+
+    const UserSchema = z.object({
+        username: z
+            .string()
+            .min(3, userLengthErr)
+            .max(20, userLengthErr)
+            .refine((value) => !bannedUsernames.includes(value) && !detect(value), userNotAllowedErr)
+            .refine((value) => !value.includes(' ') && !value.includes('*'), userCharsErr),
+        email: z.string().email('Invalid email'),
+        password: z
+            .string()
+            .min(6, passLengthErr)
+            .max(16, passLengthErr)
+            .refine((value) => !value.includes(' '), passCharsErr)
+    });
+
+    const result = UserSchema.safeParse({ username, email, password });
+
+    if (result.success === false) return res.status(400).json({ message: result.error.errors.map((err) => err.message).join('\n') });
 
     next();
 };

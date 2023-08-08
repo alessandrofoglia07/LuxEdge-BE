@@ -2,12 +2,12 @@ import { Schema, model } from 'mongoose';
 const ReviewSchema = new Schema({
     productId: {
         type: Schema.Types.ObjectId,
-        ref: "Product",
+        ref: 'Product',
         required: true
     },
     userId: {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
         required: true
     },
     rating: {
@@ -17,7 +17,7 @@ const ReviewSchema = new Schema({
     comment: {
         type: String,
         required: true,
-        default: ""
+        default: ''
     }
 }, { timestamps: true });
-export default model("Review", ReviewSchema);
+export default model('Review', ReviewSchema);

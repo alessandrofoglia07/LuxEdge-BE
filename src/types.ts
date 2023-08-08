@@ -1,5 +1,5 @@
-import { Request } from "express";
-import mongoose, { ObjectId, Document } from "mongoose";;
+import { Request } from 'express';
+import mongoose, { ObjectId, Document } from 'mongoose';
 
 export const toObjectId = (str: string): mongoose.Types.ObjectId => new mongoose.Types.ObjectId(str);
 

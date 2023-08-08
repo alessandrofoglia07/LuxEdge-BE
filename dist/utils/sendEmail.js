@@ -14,14 +14,14 @@ const sendEmail = (email, subject, text) => __awaiter(void 0, void 0, void 0, fu
             service: 'gmail',
             auth: {
                 user: process.env.DEFAULT_EMAIL,
-                pass: process.env.DEFAULT_PASSWORD,
-            },
+                pass: process.env.DEFAULT_PASSWORD
+            }
         });
         const mailOptions = {
             from: process.env.DEFAULT_EMAIL,
             to: email,
             subject: subject,
-            text: text,
+            text: text
         };
         yield transporter.sendMail(mailOptions);
     }

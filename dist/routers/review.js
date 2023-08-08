@@ -7,12 +7,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Router } from "express";
-import { toObjectId } from "../types.js";
-import Review from "../models/review.js";
-import Product from "../models/product.js";
-import checkActive from "../middlewares/checkActive.js";
-import checkUser from "../middlewares/checkUser.js";
+import { Router } from 'express';
+import { toObjectId } from '../types.js';
+import Review from '../models/review.js';
+import Product from '../models/product.js';
+import checkActive from '../middlewares/checkActive.js';
+import checkUser from '../middlewares/checkUser.js';
 const router = Router();
 router.post('/add/:id', checkUser, checkActive, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;

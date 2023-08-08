@@ -1,9 +1,9 @@
-import { Router, Response, Request } from "express";
-import { AuthRequest, toObjectId } from "../types.js";
-import Review from "../models/review.js";
-import Product from "../models/product.js";
-import checkActive from "../middlewares/checkActive.js";
-import checkUser from "../middlewares/checkUser.js";
+import { Router, Response, Request } from 'express';
+import { AuthRequest, toObjectId } from '../types.js';
+import Review from '../models/review.js';
+import Product from '../models/product.js';
+import checkActive from '../middlewares/checkActive.js';
+import checkUser from '../middlewares/checkUser.js';
 
 const router = Router();
 

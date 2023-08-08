@@ -37,7 +37,7 @@ router.patch('/removeFromCart/:id', (req, res) => __awaiter(void 0, void 0, void
         if (!product)
             return res.sendStatus(404);
         const user = req.user;
-        user.cart = user.cart.filter(productId => productId.toString() !== product._id.toString());
+        user.cart = user.cart.filter((productId) => productId.toString() !== product._id.toString());
         yield user.save();
         res.json(user.cart);
     }
@@ -71,7 +71,7 @@ router.get('/cart', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return res.status(500).json({ message: 'Internal server error' });
     }
 }));
-// add to favorites 
+// add to favorites
 router.patch('/addToFavorites/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
@@ -93,7 +93,7 @@ router.patch('/removeFromFavorites/:id', (req, res) => __awaiter(void 0, void 0,
     const { id } = req.params;
     try {
         const user = req.user;
-        user.favorites = user.favorites.filter(productId => productId.toString() !== id);
+        user.favorites = user.favorites.filter((productId) => productId.toString() !== id);
         yield user.save();
         res.json(user.favorites);
     }
