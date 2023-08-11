@@ -7,6 +7,7 @@ import { generateAccessToken, generateRefreshToken } from '../utils/auth.js';
 import sendEmail from '../utils/sendEmail.js';
 import { v4 as uuidv4 } from 'uuid';
 import Token from '../models/token.js';
+import { HTMLEmailOptions } from '../types.js';
 
 const router = Router();
 
@@ -34,14 +35,25 @@ router.post('/register', checkCredentials, async (req: Request, res: Response) =
 
         await user.save();
 
-        const text = `Hi ${username},\n\nPlease click on the link below to activate your account:\n${process.env.CLIENT_URL}/user/activate/${user._id}\n\nThanks,\nLuxEdge Team`;
-
-        await sendEmail(email, 'LuxEdge - Activate Account', text);
-
         res.status(201).json({ message: 'User registered' });
+
+        const text = 'Please click on the link below to activate your account.';
+
+        const link = {
+            href: `${process.env.CLIENT_URL}/user/activate/${user._id}`,
+            text: 'Activate account'
+        };
+
+        const HTMLOptions: HTMLEmailOptions = {
+            user,
+            text,
+            link
+        };
+
+        await sendEmail(email, 'LuxEdge - Activate Account', HTMLOptions);
     } catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 });
 
@@ -55,14 +67,17 @@ router.post('/activate/:userId', async (req: Request, res: Response) => {
         user.active = true;
         await user.save();
 
-        const text = `Hi ${user.username},\n\nYour account has been activated.\n\nThanks,\nLuxEdge Team`;
-
-        await sendEmail(user.email, 'LuxEdge - Confirmation email', text);
-
         res.json({ message: 'Account activated' });
+
+        const HTMLEmailOptions = {
+            user,
+            text: 'Your account has been successfully activated and you are now all set to start shopping!'
+        };
+
+        await sendEmail(user.email, 'LuxEdge - Confirmation email', HTMLEmailOptions);
     } catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 });
 
@@ -88,7 +103,7 @@ router.post('/login', async (req: Request, res: Response) => {
         res.json({ accessToken, refreshToken, userId: user._id, email: email, username: user.username, role: user.role, active: user.active, message: 'Login successful' });
     } catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 });
 
@@ -113,7 +128,7 @@ router.post('/refresh-token', async (req: Request, res: Response) => {
         });
     } catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 });
 
@@ -133,14 +148,21 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
             token: token
         }).save();
 
-        const text = `Hi ${user.username},\n\nPlease click on the link below to reset your password:\n${url}\n\nIf you did not request this, please ignore this email.\n\nThanks,\nLuxEdge Team`;
+        const HTMLEmailOptions = {
+            user,
+            text: 'Please click on the link below to reset your password. If you did not request this, please ignore this email.',
+            link: {
+                href: url,
+                text: 'Reset password'
+            }
+        };
 
-        await sendEmail(email, 'LuxEdge - Reset Password', text);
+        await sendEmail(email, 'LuxEdge - Reset Password', HTMLEmailOptions);
 
         res.json({ message: 'Email sent' });
     } catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 });
 
@@ -165,7 +187,7 @@ router.post('/reset-password', async (req: Request, res: Response) => {
         res.json({ message: 'Password reset' });
     } catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 });
 

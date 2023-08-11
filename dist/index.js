@@ -15,6 +15,7 @@ import userRouter from './routers/user.js';
 import adminRouter from './routers/admin.js';
 import productsRouter from './routers/products.js';
 import listsRouter from './routers/lists.js';
+import newsletterRouter from './routers/newsletter.js';
 import path from 'path';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
@@ -28,6 +29,7 @@ app.use('/api/user', userRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/lists', listsRouter);
+app.use('/api/newsletter', newsletterRouter);
 // Multer storage for uploaded images
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {

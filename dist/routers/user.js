@@ -38,13 +38,22 @@ router.post('/register', checkCredentials, (req, res) => __awaiter(void 0, void 
             active: false
         });
         yield user.save();
-        const text = `Hi ${username},\n\nPlease click on the link below to activate your account:\n${process.env.CLIENT_URL}/user/activate/${user._id}\n\nThanks,\nLuxEdge Team`;
-        yield sendEmail(email, 'LuxEdge - Activate Account', text);
         res.status(201).json({ message: 'User registered' });
+        const text = 'Please click on the link below to activate your account.';
+        const link = {
+            href: `${process.env.CLIENT_URL}/user/activate/${user._id}`,
+            text: 'Activate account'
+        };
+        const HTMLOptions = {
+            user,
+            text,
+            link
+        };
+        yield sendEmail(email, 'LuxEdge - Activate Account', HTMLOptions);
     }
     catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 }));
 // Activate account
@@ -56,13 +65,16 @@ router.post('/activate/:userId', (req, res) => __awaiter(void 0, void 0, void 0,
             return res.status(404).json({ message: 'User not found' });
         user.active = true;
         yield user.save();
-        const text = `Hi ${user.username},\n\nYour account has been activated.\n\nThanks,\nLuxEdge Team`;
-        yield sendEmail(user.email, 'LuxEdge - Confirmation email', text);
         res.json({ message: 'Account activated' });
+        const HTMLEmailOptions = {
+            user,
+            text: 'Your account has been successfully activated and you are now all set to start shopping!'
+        };
+        yield sendEmail(user.email, 'LuxEdge - Confirmation email', HTMLEmailOptions);
     }
     catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 }));
 // Login
@@ -86,7 +98,7 @@ router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
     catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 }));
 // Refresh token
@@ -108,7 +120,7 @@ router.post('/refresh-token', (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
     catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 }));
 // Forgot password
@@ -124,13 +136,20 @@ router.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void 0, 
             userId: user._id,
             token: token
         }).save();
-        const text = `Hi ${user.username},\n\nPlease click on the link below to reset your password:\n${url}\n\nIf you did not request this, please ignore this email.\n\nThanks,\nLuxEdge Team`;
-        yield sendEmail(email, 'LuxEdge - Reset Password', text);
+        const HTMLEmailOptions = {
+            user,
+            text: 'Please click on the link below to reset your password. If you did not request this, please ignore this email.',
+            link: {
+                href: url,
+                text: 'Reset password'
+            }
+        };
+        yield sendEmail(email, 'LuxEdge - Reset Password', HTMLEmailOptions);
         res.json({ message: 'Email sent' });
     }
     catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 }));
 // Reset password
@@ -153,7 +172,7 @@ router.post('/reset-password', (req, res) => __awaiter(void 0, void 0, void 0, f
     }
     catch (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.sendStatus(500);
     }
 }));
 export default router;

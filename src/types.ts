@@ -45,3 +45,13 @@ export interface ITokenDocument extends Document {
     userId: ObjectId;
     token: string;
 }
+
+export type HTMLEmailOptions = {
+    user: IUserDocument;
+    text: string;
+    imgSrc?: string;
+    link?: {
+        href: string;
+        text: string;
+    };
+};
