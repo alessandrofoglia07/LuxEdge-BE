@@ -13,6 +13,7 @@ import checkActive from '../middlewares/checkActive.js';
 import checkAdmin from '../middlewares/checkAdmin.js';
 import { upload } from '../index.js';
 import Product from '../models/product.js';
+import { sendNewProduct } from './newsletter.js';
 const router = Router();
 router.use([checkUser, checkActive, checkAdmin]);
 // add product
@@ -36,7 +37,8 @@ router.post('/addProduct', (req, res) => __awaiter(void 0, void 0, void 0, funct
                 tags: tags.split(',').map((tag) => tag.trim())
             });
             yield product.save();
-            return res.status(201).json({ message: 'Product added successfully' });
+            res.status(201).json({ message: 'Product added successfully' });
+            yield sendNewProduct(product._id.toString());
         }
         catch (err) {
             console.log(err);

@@ -46,6 +46,12 @@ export interface ITokenDocument extends Document {
     token: string;
 }
 
+export interface INewsletterSubscriberDocument extends Document {
+    email: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export type HTMLEmailOptions = {
     user: IUserDocument;
     text: string;

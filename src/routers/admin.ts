@@ -5,6 +5,7 @@ import checkAdmin from '../middlewares/checkAdmin.js';
 import { AuthRequest } from '../types.js';
 import { upload } from '../index.js';
 import Product from '../models/product.js';
+import { sendNewProduct } from './newsletter.js';
 
 const router = Router();
 
@@ -35,7 +36,9 @@ router.post('/addProduct', async (req: AuthRequest, res: Response) => {
             });
             await product.save();
 
-            return res.status(201).json({ message: 'Product added successfully' });
+            res.status(201).json({ message: 'Product added successfully' });
+
+            await sendNewProduct(product._id.toString());
         } catch (err) {
             console.log(err);
             return res.status(500).json({ message: 'Internal server error' });
