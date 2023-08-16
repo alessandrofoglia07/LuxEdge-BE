@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connect } from 'mongoose';
@@ -68,4 +68,9 @@ await (async () => {
 
 app.use(express.static('public/images'));
 
-app.all('*', (req, res) => res.sendStatus(404));
+app.get('/', (req: Request, res: Response) => {
+    const url = process.env.CLIENT_URL;
+    url ? res.redirect(url) : res.sendStatus(404);
+});
+
+app.all('*', (req: Request, res: Response) => res.sendStatus(404));

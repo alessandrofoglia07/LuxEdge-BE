@@ -55,6 +55,8 @@ router.get('/getReviews/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
 router.get('/getScore/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
+        if (!id)
+            return res.status(404).json({ message: 'Product not found' });
         const reviews = yield Review.find({ productId: toObjectId(id) });
         const score = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
         return res.json({ score });

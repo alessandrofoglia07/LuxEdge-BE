@@ -12,6 +12,7 @@ import NewsletterSubscriber from '../models/newsletterSubscriber.js';
 import sendEmail from '../utils/sendEmail.js';
 import Product from '../models/product.js';
 import User from '../models/user.js';
+import * as cron from 'node-cron';
 const router = Router();
 // Subscribe
 router.post('/subscribe', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -41,6 +42,7 @@ router.post('/unsubscribe/:email', (req, res) => __awaiter(void 0, void 0, void 
         return res.sendStatus(500);
     }
 }));
+/** Send newsletter email to all the subscribers (10 emails at a time) */
 const sendNewsletter = (title, NewsletterOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const subscribers = yield NewsletterSubscriber.find();
     const batchSize = 10;
@@ -74,6 +76,7 @@ const sendProductOfTheWeek = () => __awaiter(void 0, void 0, void 0, function* (
     };
     yield sendNewsletter(`${product.name} - Product of the week!`, NewsletterOptions);
 });
+cron.schedule('0 9 * * 0', sendProductOfTheWeek);
 export const sendNewProduct = (productId) => __awaiter(void 0, void 0, void 0, function* () {
     const product = yield Product.findById(productId);
     if (!product)

@@ -4,9 +4,9 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "build": "tsc",
+        "build": "tsc -p .",
         "dev:ts": "tsc -w",
-        "dev:js": "nodemon dist/index.js",
+        "dev:js": "npx nodemon --legacy-watch --watch src --watch app dist/index.js",
         "dev": "concurrently npm:dev:*",
         "start": "node dist/index.js"
     },
@@ -16,7 +16,6 @@
     "dependencies": {
         "bcrypt": "^5.1.0",
         "cheerio": "^1.0.0-rc.12",
-        "concurrently": "^8.2.0",
         "cors": "^2.8.5",
         "curse-filter": "^3.1.0",
         "dotenv": "^16.3.1",
@@ -41,7 +40,9 @@
         "@types/uuid": "^9.0.2",
         "@typescript-eslint/eslint-plugin": "^6.2.0",
         "@typescript-eslint/parser": "^6.2.0",
-        "eslint": "^8.45.0"
+        "concurrently": "^8.2.0",
+        "eslint": "^8.45.0",
+        "typescript": "^5.1.6"
     },
     "type": "module"
 }

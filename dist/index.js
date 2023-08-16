@@ -66,4 +66,8 @@ await (() => __awaiter(void 0, void 0, void 0, function* () {
     }
 }))();
 app.use(express.static('public/images'));
-app.all('*', (req, res) => res.sendStatus(404));
+app.get('/', (req, res) => {
+    const url = process.env.CLIENT_URL;
+    url ? res.redirect(url) : res.sendStatus(404);
+});
+app.all('*', (req, res) => res.sendStatus(500));

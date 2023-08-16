@@ -11,9 +11,11 @@ import { Router } from 'express';
 import Product from '../models/product.js';
 const router = Router();
 const randomSort = (arr) => {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+    if (arr && arr.length) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
     }
     return arr;
 };
@@ -21,8 +23,7 @@ const randomSort = (arr) => {
 router.get('/suggested', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const limit = req.query.limit ? Number(req.query.limit) : 10;
     const products = yield Product.aggregate([
-        { $match: {} },
-        { $limit: limit },
+        { $sample: { size: limit } },
         { $lookup: { from: 'reviews', localField: '_id', foreignField: 'productId', as: 'reviews' } },
         { $addFields: { rawScore: { $avg: '$reviews.rating' } } },
         { $addFields: { score: { $round: ['$rawScore', 2] } } },
