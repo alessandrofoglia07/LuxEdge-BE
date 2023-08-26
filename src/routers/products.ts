@@ -62,9 +62,9 @@ router.get('/search', async (req: Request, res: Response) => {
 // get details of a product
 router.get('/details/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
-    const products = Product.findById(id);
-    if (!products) return res.sendStatus(404);
-    res.json(products);
+    const product = Product.findById(id);
+    if (!product) return res.sendStatus(404);
+    res.json(product);
 });
 
 export default router;

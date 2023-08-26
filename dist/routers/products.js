@@ -63,9 +63,9 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 // get details of a product
 router.get('/details/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const products = Product.findById(id);
-    if (!products)
+    const product = Product.findById(id);
+    if (!product)
         return res.sendStatus(404);
-    res.json(products);
+    res.json(product);
 }));
 export default router;
