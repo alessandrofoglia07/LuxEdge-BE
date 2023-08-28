@@ -24,9 +24,9 @@ router.post('/register', checkCredentials, (req, res) => __awaiter(void 0, void 
         const emailAlreadyExists = Boolean(yield User.findOne({ email: email }));
         const userAlreadyExists = Boolean(yield User.findOne({ username: username }));
         if (emailAlreadyExists)
-            return res.status(409).json({ message: 'Email already registered' });
+            return res.status(409).json({ message: 'Email already registered.' });
         if (userAlreadyExists)
-            return res.status(409).json({ message: 'Username already taken' });
+            return res.status(409).json({ message: 'Username already taken.' });
         const hash = yield bcrypt.hash(password, 10);
         const user = new User({
             username,
@@ -38,7 +38,7 @@ router.post('/register', checkCredentials, (req, res) => __awaiter(void 0, void 
             active: false
         });
         yield user.save();
-        res.status(201).json({ message: 'User registered' });
+        res.status(201).json({ message: 'User registered. An email has been sent to activate your account.' });
         const text = 'Please click on the link below to activate your account.';
         const link = {
             href: `${process.env.CLIENT_URL}/user/activate/${user._id}`,
@@ -63,6 +63,8 @@ router.post('/activate/:userId', (req, res) => __awaiter(void 0, void 0, void 0,
         const user = yield User.findById(userId);
         if (!user)
             return res.status(404).json({ message: 'User not found' });
+        if (user.active)
+            return res.status(409).json({ message: 'Account already activated' });
         user.active = true;
         yield user.save();
         res.json({ message: 'Account activated' });

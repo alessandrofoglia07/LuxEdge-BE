@@ -19,8 +19,8 @@ router.post('/register', checkCredentials, async (req: Request, res: Response) =
         const emailAlreadyExists = Boolean(await User.findOne({ email: email }));
         const userAlreadyExists = Boolean(await User.findOne({ username: username }));
 
-        if (emailAlreadyExists) return res.status(409).json({ message: 'Email already registered' });
-        if (userAlreadyExists) return res.status(409).json({ message: 'Username already taken' });
+        if (emailAlreadyExists) return res.status(409).json({ message: 'Email already registered.' });
+        if (userAlreadyExists) return res.status(409).json({ message: 'Username already taken.' });
 
         const hash = await bcrypt.hash(password, 10);
         const user = new User({
@@ -35,7 +35,7 @@ router.post('/register', checkCredentials, async (req: Request, res: Response) =
 
         await user.save();
 
-        res.status(201).json({ message: 'User registered' });
+        res.status(201).json({ message: 'User registered. An email has been sent to activate your account.' });
 
         const text = 'Please click on the link below to activate your account.';
 
@@ -64,6 +64,8 @@ router.post('/activate/:userId', async (req: Request, res: Response) => {
     try {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
+        if (user.active) return res.status(409).json({ message: 'Account already activated' });
+
         user.active = true;
         await user.save();
 
