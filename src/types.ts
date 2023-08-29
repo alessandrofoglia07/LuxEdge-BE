@@ -44,6 +44,8 @@ export interface AuthRequest extends Request {
 export interface ITokenDocument extends Document {
     userId: ObjectId;
     token: string;
+    createdAt: Date;
+    expiresAt: Date;
 }
 
 export interface INewsletterSubscriberDocument extends Document {

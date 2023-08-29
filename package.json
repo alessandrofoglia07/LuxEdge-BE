@@ -6,7 +6,7 @@
     "scripts": {
         "build": "tsc -p .",
         "dev:ts": "tsc -w",
-        "dev:js": "nodemon --legacy-watch --watch ./src --watch ./app/src dist/index.js",
+        "dev:js": "nodemon dist/index.js",
         "dev": "concurrently npm:dev:*",
         "start": "node dist/index.js"
     },

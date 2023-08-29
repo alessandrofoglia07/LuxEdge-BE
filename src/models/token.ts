@@ -8,6 +8,7 @@ const tokenSchema = new Schema({
     },
     userId: {
         type: Schema.Types.ObjectId,
+        unique: true,
         required: true,
         ref: 'User'
     },
@@ -15,6 +16,10 @@ const tokenSchema = new Schema({
         type: Date,
         default: Date.now,
         expires: 3600
+    },
+    expiresAt: {
+        type: Date,
+        default: new Date(Date.now() + 3600)
     }
 });
 

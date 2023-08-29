@@ -132,6 +132,9 @@ router.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void 0, 
         const user = yield User.findOne({ email: email });
         if (!user)
             return res.status(404).json({ message: 'User not found' });
+        const tokenExists = yield Token.findOne({ userId: user._id });
+        if (!!tokenExists)
+            return res.status(409).json({ message: 'A password reset email has already been sent' });
         const token = uuidv4();
         const url = `${process.env.CLIENT_URL}/user/reset-password/${user._id}/${token}`;
         yield new Token({
@@ -155,12 +158,15 @@ router.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 }));
 // Reset password
-router.post('/reset-password', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, token, password } = req.body;
+router.post('/reset-password/:userId/:token', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { password } = req.body;
+    const { userId, token } = req.params;
     try {
         const result = yield Token.findOne({ userId: userId, token: token });
         if (!result)
             return res.status(404).json({ message: 'Invalid token' });
+        if (result.expiresAt.getTime() < Date.now())
+            return res.status(403).json({ message: 'Token expired' });
         const user = yield User.findById(userId);
         if (!user)
             return res.status(404).json({ message: 'User not found' });

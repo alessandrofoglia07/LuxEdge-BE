@@ -142,6 +142,9 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
         const user = await User.findOne({ email: email });
         if (!user) return res.status(404).json({ message: 'User not found' });
 
+        const tokenExists = await Token.findOne({ userId: user._id });
+        if (!!tokenExists) return res.status(409).json({ message: 'A password reset email has already been sent' });
+
         const token = uuidv4();
         const url = `${process.env.CLIENT_URL}/user/reset-password/${user._id}/${token}`;
 
@@ -169,12 +172,14 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
 });
 
 // Reset password
-router.post('/reset-password', async (req: Request, res: Response) => {
-    const { userId, token, password } = req.body;
+router.post('/reset-password/:userId/:token', async (req: Request, res: Response) => {
+    const { password } = req.body;
+    const { userId, token } = req.params;
 
     try {
         const result = await Token.findOne({ userId: userId, token: token });
         if (!result) return res.status(404).json({ message: 'Invalid token' });
+        if (result.expiresAt.getTime() < Date.now()) return res.status(403).json({ message: 'Token expired' });
 
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
