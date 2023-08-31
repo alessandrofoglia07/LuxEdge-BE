@@ -1,5 +1,5 @@
 import { Router, Response, Request } from 'express';
-import { AuthRequest, toObjectId } from '../types.js';
+import { AuthRequest } from '../types.js';
 import Review from '../models/review.js';
 import Product from '../models/product.js';
 import checkActive from '../middlewares/checkActive.js';
@@ -55,7 +55,7 @@ router.get('/getScore/:id', async (req: Request, res: Response) => {
     try {
         if (!id) return res.status(404).json({ message: 'Product not found' });
 
-        const reviews = await Review.find({ productId: toObjectId(id) });
+        const reviews = await Review.find({ productId: id });
         const score = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
         return res.json({ score });
     } catch (err) {

@@ -1,15 +1,15 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, SchemaTypes } from 'mongoose';
 import { IReviewDocument } from '../types.js';
 
 const ReviewSchema = new Schema<IReviewDocument>(
     {
         productId: {
-            type: Schema.Types.ObjectId,
+            type: SchemaTypes.ObjectId,
             ref: 'Product',
             required: true
         },
         userId: {
-            type: Schema.Types.ObjectId,
+            type: SchemaTypes.ObjectId,
             ref: 'User',
             required: true
         },

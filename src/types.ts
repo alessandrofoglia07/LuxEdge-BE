@@ -1,14 +1,12 @@
 import { Request } from 'express';
-import mongoose, { ObjectId, Document } from 'mongoose';
-
-export const toObjectId = (str: string): mongoose.Types.ObjectId => new mongoose.Types.ObjectId(str);
+import { Types, Document } from 'mongoose';
 
 export interface IUserDocument extends Document {
     email: string;
     username: string;
     password: string;
-    cart: ObjectId[];
-    favorites: ObjectId[];
+    cart: Types.ObjectId[];
+    favorites: Types.ObjectId[];
     role: 'user' | 'admin';
     active: boolean;
     createdAt: Date;
@@ -23,14 +21,14 @@ export interface IProductDocument extends Document {
     tags: string[];
     sold: number;
     available: boolean;
-    reviews: ObjectId[];
+    reviews: Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
 }
 
 export interface IReviewDocument extends Document {
-    productId: ObjectId;
-    userId: ObjectId;
+    productId: Types.ObjectId;
+    userId: Types.ObjectId;
     rating: number;
     comment: string;
     createdAt: Date;
@@ -42,7 +40,7 @@ export interface AuthRequest extends Request {
 }
 
 export interface ITokenDocument extends Document {
-    userId: ObjectId;
+    userId: Types.ObjectId;
     token: string;
     createdAt: Date;
     expiresAt: Date;

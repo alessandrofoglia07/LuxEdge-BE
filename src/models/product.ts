@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, SchemaTypes } from 'mongoose';
 import { IProductDocument } from '../types.js';
 
 const ProductSchema = new Schema<IProductDocument>(
@@ -35,7 +35,7 @@ const ProductSchema = new Schema<IProductDocument>(
             default: true
         },
         reviews: {
-            type: [Schema.Types.ObjectId],
+            type: [SchemaTypes.ObjectId],
             ref: 'Review',
             default: []
         }

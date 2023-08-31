@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, SchemaTypes } from 'mongoose';
 import { ITokenDocument } from '../types.js';
 
 const tokenSchema = new Schema({
@@ -7,14 +7,14 @@ const tokenSchema = new Schema({
         required: true
     },
     userId: {
-        type: Schema.Types.ObjectId,
+        type: SchemaTypes.ObjectId,
         unique: true,
         required: true,
         ref: 'User'
     },
     createdAt: {
         type: Date,
-        default: Date.now,
+        default: () => Date.now(),
         expires: 3600
     },
     expiresAt: {
