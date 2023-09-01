@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, SchemaTypes } from 'mongoose';
 const ProductSchema = new Schema({
     name: {
         type: String,
@@ -32,7 +32,7 @@ const ProductSchema = new Schema({
         default: true
     },
     reviews: {
-        type: [Schema.Types.ObjectId],
+        type: [SchemaTypes.ObjectId],
         ref: 'Review',
         default: []
     }

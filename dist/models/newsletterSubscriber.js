@@ -3,7 +3,8 @@ const NewsletterSubscriberSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true
     }
 }, { timestamps: true });
 export default model('NewsletterSubscriber', NewsletterSubscriberSchema);

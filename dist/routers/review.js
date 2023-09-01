@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Router } from 'express';
-import { toObjectId } from '../types.js';
 import Review from '../models/review.js';
 import Product from '../models/product.js';
 import checkActive from '../middlewares/checkActive.js';
@@ -57,7 +56,7 @@ router.get('/getScore/:id', (req, res) => __awaiter(void 0, void 0, void 0, func
     try {
         if (!id)
             return res.status(404).json({ message: 'Product not found' });
-        const reviews = yield Review.find({ productId: toObjectId(id) });
+        const reviews = yield Review.find({ productId: id });
         const score = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
         return res.json({ score });
     }
