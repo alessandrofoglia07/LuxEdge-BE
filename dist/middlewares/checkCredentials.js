@@ -3,7 +3,8 @@ import { z } from 'zod';
 const bannedUsernames = ['post', 'comment', 'admin', 'administrator', 'moderator', 'mod', 'user', 'users'];
 /** Check if username, email and password are valid */
 const checkCredentials = (req, res, next) => {
-    const { username, email, password } = req.body;
+    let { username, email, password } = req.body;
+    username = username.trim();
     const userLengthErr = 'Username must be 3-20 characters long';
     const userCharsErr = 'Username cannot contain spaces or asterisks';
     const userNotAllowedErr = 'Username not allowed';
@@ -14,6 +15,7 @@ const checkCredentials = (req, res, next) => {
             .string()
             .min(3, userLengthErr)
             .max(20, userLengthErr)
+            .trim()
             .refine((value) => !bannedUsernames.includes(value) && !detect(value), userNotAllowedErr)
             .refine((value) => !value.includes(' ') && !value.includes('*'), userCharsErr),
         email: z.string().email('Invalid email'),

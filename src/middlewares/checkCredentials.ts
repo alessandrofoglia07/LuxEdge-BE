@@ -6,7 +6,9 @@ const bannedUsernames = ['post', 'comment', 'admin', 'administrator', 'moderator
 
 /** Check if username, email and password are valid */
 const checkCredentials = (req: Request, res: Response, next: NextFunction) => {
-    const { username, email, password } = req.body;
+    let { username, email, password } = req.body;
+
+    username = username.trim();
 
     const userLengthErr = 'Username must be 3-20 characters long';
     const userCharsErr = 'Username cannot contain spaces or asterisks';
@@ -20,6 +22,7 @@ const checkCredentials = (req: Request, res: Response, next: NextFunction) => {
             .string()
             .min(3, userLengthErr)
             .max(20, userLengthErr)
+            .trim()
             .refine((value) => !bannedUsernames.includes(value) && !detect(value), userNotAllowedErr)
             .refine((value) => !value.includes(' ') && !value.includes('*'), userCharsErr),
         email: z.string().email('Invalid email'),

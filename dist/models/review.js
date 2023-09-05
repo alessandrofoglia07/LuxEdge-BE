@@ -12,12 +12,17 @@ const ReviewSchema = new Schema({
     },
     rating: {
         type: Number,
+        min: 1,
+        max: 5,
         required: true
     },
     comment: {
         type: String,
         required: true,
-        default: ''
+        minlength: 20,
+        maxlength: 500,
+        default: '',
+        trim: true
     }
 }, { timestamps: true });
 export default model('Review', ReviewSchema);

@@ -1,15 +1,17 @@
 import { Schema, model, SchemaTypes } from 'mongoose';
-import { IProductDocument } from '../types.js';
+import { IProductDocument, IReviewDocument } from '../types.js';
 
 const ProductSchema = new Schema<IProductDocument>(
     {
         name: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
         description: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
         price: {
             type: Number,
@@ -42,5 +44,26 @@ const ProductSchema = new Schema<IProductDocument>(
     },
     { timestamps: true }
 );
+
+ProductSchema.virtual('rating').get(async function () {
+    if (this.reviews.length === 0) return 0;
+
+    await this.populate('reviews');
+    const reviews = this.reviews as unknown as IReviewDocument[];
+
+    const totalRating = reviews.reduce((acc, review) => {
+        const reviewDocument = review;
+
+        return acc + reviewDocument.rating;
+    }, 0);
+
+    const avgRating = totalRating / this.reviews.length;
+
+    return Math.round(avgRating * 10) / 10;
+});
+
+ProductSchema.set('toJSON', {
+    virtuals: true
+});
 
 export default model<IProductDocument>('Product', ProductSchema);

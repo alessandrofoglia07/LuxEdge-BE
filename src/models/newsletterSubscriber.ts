@@ -7,6 +7,7 @@ const NewsletterSubscriberSchema = new Schema<INewsletterSubscriberDocument>(
             type: String,
             required: true,
             unique: true,
+            maxlength: 320,
             lowercase: true
         }
     },

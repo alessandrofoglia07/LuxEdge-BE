@@ -7,13 +7,16 @@ const UserSchema = new Schema<IUserDocument>(
             type: String,
             required: true,
             minlength: 3,
-            maxlength: 20
+            maxlength: 20,
+            trim: true
         },
         email: {
             type: String,
             required: true,
             unique: true,
-            lowercase: true
+            maxlength: 320,
+            lowercase: true,
+            trim: true
         },
         password: {
             type: String,

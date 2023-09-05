@@ -24,6 +24,7 @@ export interface IProductDocument extends Document {
     reviews: Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
+    rating: number;
 }
 
 export interface IReviewDocument extends Document {
