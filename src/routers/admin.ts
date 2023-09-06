@@ -9,22 +9,26 @@ import { sendNewProduct } from './newsletter.js';
 
 const router = Router();
 
-router.use([checkUser, checkActive, checkAdmin]);
+// router.use([checkUser, checkActive, checkAdmin]);
 
 // add product
-router.post('/addProduct', async (req: AuthRequest, res: Response) => {
-    upload(req, res, async (err: any) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({ message: err.message });
-        }
+router.post('/addProduct', (req, res) =>
+    upload(req, res, async () => {
+        console.log(req.body);
 
         if (!req.file) {
             return res.status(400).json({ message: 'Please upload a file.' });
         }
 
+        interface ProductData {
+            name: string;
+            price: number;
+            description: string;
+            tags: string[];
+        }
+
         const { filename } = req.file;
-        const { name, price, description, tags } = JSON.parse(req.body.data);
+        const { name, price, description, tags }: ProductData = JSON.parse(req.body.data);
 
         try {
             const product = new Product({
@@ -32,7 +36,7 @@ router.post('/addProduct', async (req: AuthRequest, res: Response) => {
                 description,
                 price,
                 imagePath: filename,
-                tags: tags.split(',').map((tag: string) => tag.trim())
+                tags: tags
             });
             await product.save();
 
@@ -43,8 +47,8 @@ router.post('/addProduct', async (req: AuthRequest, res: Response) => {
             console.log(err);
             return res.status(500).json({ message: 'Internal server error' });
         }
-    });
-});
+    })
+);
 
 // Delete product
 router.delete('/deleteProduct/:id', async (req: AuthRequest, res: Response) => {
