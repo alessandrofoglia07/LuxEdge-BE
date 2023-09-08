@@ -7,9 +7,6 @@ import adminRouter from './routers/admin.js';
 import productsRouter from './routers/products.js';
 import listsRouter from './routers/lists.js';
 import newsletterRouter from './routers/newsletter.js';
-import path from 'path';
-import multer from 'multer';
-import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
@@ -27,31 +24,6 @@ app.use('/api/admin', adminRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/lists', listsRouter);
 app.use('/api/newsletter', newsletterRouter);
-
-// Multer storage for uploaded images
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/images/');
-    },
-    filename: (req, file, cb) => {
-        const uniqueFilename = `${uuidv4()}-${file.originalname}`;
-        cb(null, uniqueFilename);
-    }
-});
-
-// File upload with multer
-export const upload: any = multer({
-    storage,
-    fileFilter: (req, file, cb) => {
-        const fileTypes = /jpeg|jpg|png|gif/;
-        const mimetype = fileTypes.test(file.mimetype);
-        const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-        if (mimetype && extname) {
-            return cb(null, true);
-        }
-        cb(new Error('Error: Images only'));
-    }
-}).single('image');
 
 const PORT = process.env.PORT || 5000;
 const MONGO = process.env.MONGODB_URI || '';

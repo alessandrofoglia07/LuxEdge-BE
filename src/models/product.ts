@@ -42,13 +42,20 @@ const ProductSchema = new Schema<IProductDocument>(
             default: []
         }
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        toJSON: {
+            virtuals: true
+        },
+        toObject: {
+            virtuals: true
+        }
+    }
 );
 
 ProductSchema.virtual('rating').get(async function () {
     if (this.reviews.length === 0) return 0;
 
-    await this.populate('reviews');
     const reviews = this.reviews as unknown as IReviewDocument[];
 
     const totalRating = reviews.reduce((acc, review) => {
@@ -60,10 +67,6 @@ ProductSchema.virtual('rating').get(async function () {
     const avgRating = totalRating / this.reviews.length;
 
     return Math.round(avgRating * 10) / 10;
-});
-
-ProductSchema.set('toJSON', {
-    virtuals: true
 });
 
 export default model<IProductDocument>('Product', ProductSchema);

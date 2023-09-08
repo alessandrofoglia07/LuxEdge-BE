@@ -11,40 +11,40 @@ import { Router } from 'express';
 import checkUser from '../middlewares/checkUser.js';
 import checkActive from '../middlewares/checkActive.js';
 import checkAdmin from '../middlewares/checkAdmin.js';
-import { upload } from '../index.js';
 import Product from '../models/product.js';
 import { sendNewProduct } from './newsletter.js';
+import multer from 'multer';
 const router = Router();
 router.use([checkUser, checkActive, checkAdmin]);
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, './public/images/products'),
+        filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+    })
+});
 // add product
-router.post('/addProduct', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    upload(req, res, (err) => __awaiter(void 0, void 0, void 0, function* () {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({ message: err.message });
-        }
-        if (!req.file) {
-            return res.status(400).json({ message: 'Please upload a file.' });
-        }
-        const { filename } = req.file;
-        const { name, price, description, tags } = JSON.parse(req.body.data);
-        try {
-            const product = new Product({
-                name,
-                description,
-                price,
-                imagePath: filename,
-                tags: tags.split(',').map((tag) => tag.trim())
-            });
-            yield product.save();
-            res.status(201).json({ message: 'Product added successfully' });
-            yield sendNewProduct(product._id.toString());
-        }
-        catch (err) {
-            console.log(err);
-            return res.status(500).json({ message: 'Internal server error' });
-        }
-    }));
+router.post('/addProduct', upload.single('image'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.file) {
+        return res.status(400).json({ message: 'Please upload a file.' });
+    }
+    const { filename } = req.file;
+    const { name, price, description, tags } = req.body;
+    try {
+        const product = new Product({
+            name,
+            description,
+            price,
+            imagePath: filename,
+            tags: tags
+        });
+        yield product.save();
+        res.status(201).json({ message: 'Product added successfully' });
+        yield sendNewProduct(product._id.toString());
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
 }));
 // Delete product
 router.delete('/deleteProduct/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

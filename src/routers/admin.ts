@@ -3,52 +3,55 @@ import checkUser from '../middlewares/checkUser.js';
 import checkActive from '../middlewares/checkActive.js';
 import checkAdmin from '../middlewares/checkAdmin.js';
 import { AuthRequest } from '../types.js';
-import { upload } from '../index.js';
 import Product from '../models/product.js';
 import { sendNewProduct } from './newsletter.js';
+import multer from 'multer';
 
 const router = Router();
 
-// router.use([checkUser, checkActive, checkAdmin]);
+router.use([checkUser, checkActive, checkAdmin]);
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, './public/images/products'),
+        filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+    })
+});
 
 // add product
-router.post('/addProduct', (req, res) =>
-    upload(req, res, async () => {
-        console.log(req.body);
+router.post('/addProduct', upload.single('image'), async (req: AuthRequest, res: Response) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'Please upload a file.' });
+    }
 
-        if (!req.file) {
-            return res.status(400).json({ message: 'Please upload a file.' });
-        }
+    interface ProductData {
+        name: string;
+        price: number;
+        description: string;
+        tags: string[];
+    }
 
-        interface ProductData {
-            name: string;
-            price: number;
-            description: string;
-            tags: string[];
-        }
+    const { filename } = req.file;
+    const { name, price, description, tags }: ProductData = req.body;
 
-        const { filename } = req.file;
-        const { name, price, description, tags }: ProductData = JSON.parse(req.body.data);
+    try {
+        const product = new Product({
+            name,
+            description,
+            price,
+            imagePath: filename,
+            tags: tags
+        });
+        await product.save();
 
-        try {
-            const product = new Product({
-                name,
-                description,
-                price,
-                imagePath: filename,
-                tags: tags
-            });
-            await product.save();
+        res.status(201).json({ message: 'Product added successfully' });
 
-            res.status(201).json({ message: 'Product added successfully' });
-
-            await sendNewProduct(product._id.toString());
-        } catch (err) {
-            console.log(err);
-            return res.status(500).json({ message: 'Internal server error' });
-        }
-    })
-);
+        await sendNewProduct(product._id.toString());
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 // Delete product
 router.delete('/deleteProduct/:id', async (req: AuthRequest, res: Response) => {

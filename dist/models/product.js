@@ -47,12 +47,19 @@ const ProductSchema = new Schema({
         ref: 'Review',
         default: []
     }
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    toJSON: {
+        virtuals: true
+    },
+    toObject: {
+        virtuals: true
+    }
+});
 ProductSchema.virtual('rating').get(function () {
     return __awaiter(this, void 0, void 0, function* () {
         if (this.reviews.length === 0)
             return 0;
-        yield this.populate('reviews');
         const reviews = this.reviews;
         const totalRating = reviews.reduce((acc, review) => {
             const reviewDocument = review;
@@ -61,8 +68,5 @@ ProductSchema.virtual('rating').get(function () {
         const avgRating = totalRating / this.reviews.length;
         return Math.round(avgRating * 10) / 10;
     });
-});
-ProductSchema.set('toJSON', {
-    virtuals: true
 });
 export default model('Product', ProductSchema);
