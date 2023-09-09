@@ -110,7 +110,7 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 // get details of a product
 router.get('/details/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const product = Product.findById(id);
+    const product = yield Product.findById(id).populate('reviews');
     if (!product)
         return res.sendStatus(404);
     res.json(product);

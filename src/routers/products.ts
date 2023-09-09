@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import Product from '../models/product.js';
-import { PipelineStage } from 'mongoose';
 
 const router = Router();
 
@@ -114,7 +113,7 @@ router.get('/search', async (req: Request, res: Response) => {
 // get details of a product
 router.get('/details/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
-    const product = Product.findById(id);
+    const product = await Product.findById(id).populate('reviews');
     if (!product) return res.sendStatus(404);
     res.json(product);
 });
