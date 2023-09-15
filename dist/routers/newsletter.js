@@ -13,11 +13,21 @@ import sendEmail from '../utils/sendEmail.js';
 import Product from '../models/product.js';
 import User from '../models/user.js';
 import * as cron from 'node-cron';
+import { z } from 'zod';
 const router = Router();
 // Subscribe
 router.post('/subscribe', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     try {
+        z.string().email().parse(email);
+    }
+    catch (err) {
+        return res.status(400).json({ message: 'Invalid email address' });
+    }
+    try {
+        const subscriber = yield NewsletterSubscriber.findOne({ email });
+        if (subscriber)
+            return res.sendStatus(409);
         const newSubscriber = new NewsletterSubscriber({ email });
         yield newSubscriber.save();
         return res.sendStatus(201);

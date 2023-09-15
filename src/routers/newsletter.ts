@@ -5,6 +5,7 @@ import Product from '../models/product.js';
 import { HTMLEmailOptions, IProductDocument } from '../types.js';
 import User from '../models/user.js';
 import * as cron from 'node-cron';
+import { z } from 'zod';
 
 const router = Router();
 
@@ -13,6 +14,16 @@ router.post('/subscribe', async (req: Request, res: Response) => {
     const { email } = req.body;
 
     try {
+        z.string().email().parse(email);
+    } catch (err) {
+        return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    try {
+        const subscriber = await NewsletterSubscriber.findOne({ email });
+
+        if (subscriber) return res.sendStatus(409);
+
         const newSubscriber = new NewsletterSubscriber({ email });
         await newSubscriber.save();
         return res.sendStatus(201);
