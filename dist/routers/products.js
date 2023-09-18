@@ -92,12 +92,13 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         .sort(sort)
         .skip(skip)
         .limit(limit);
-    const count = (yield Product.aggregate()
+    const countObj = (yield Product.aggregate()
         .match({
         tags: { $in: tags },
         price: { $gte: price[0], $lte: price[1] }
     })
-        .count('count'))[0].count;
+        .count('count'))[0];
+    const count = countObj ? countObj.count : 0;
     if (products === undefined)
         return res.sendStatus(404);
     res.json({

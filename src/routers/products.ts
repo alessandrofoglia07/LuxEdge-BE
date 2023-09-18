@@ -91,14 +91,16 @@ router.get('/search', async (req: Request, res: Response) => {
         .skip(skip)
         .limit(limit);
 
-    const count = (
+    const countObj = (
         await Product.aggregate()
             .match({
                 tags: { $in: tags },
                 price: { $gte: price[0], $lte: price[1] }
             })
             .count('count')
-    )[0].count;
+    )[0];
+
+    const count = countObj ? countObj.count : 0;
 
     if (products === undefined) return res.sendStatus(404);
 
