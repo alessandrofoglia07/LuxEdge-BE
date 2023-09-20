@@ -47,10 +47,8 @@ router.get('/search', async (req: Request, res: Response) => {
         tags = ['bedroom', 'bed', 'bookshelf', 'chair', 'desk', 'drawer', 'livingroom', 'sofa', 'table'];
     }
     // e.g. price=0,100 => price = [0, 100] (price >= 0 && price <= 100)
-    const price = priceQuery
-        .split(',')
-        .map((p) => Number(p.trim()))
-        .filter((p) => Boolean(p));
+    const price = priceQuery.split(',').map((p) => Number(p.trim()));
+
     // e.g. rating=3,5 => rating = [3, 5] (rating >= 3 && rating <= 5)
     const rating = ratingQuery
         .split(',')
