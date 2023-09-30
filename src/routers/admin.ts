@@ -28,11 +28,11 @@ router.post('/addProduct', upload.single('image'), async (req: AuthRequest, res:
         name: string;
         price: number;
         description: string;
-        tags: string[];
+        category: string;
     }
 
     const { filename } = req.file;
-    const { name, price, description, tags }: ProductData = req.body;
+    const { name, price, description, category }: ProductData = req.body;
 
     try {
         const product = new Product({
@@ -40,7 +40,7 @@ router.post('/addProduct', upload.single('image'), async (req: AuthRequest, res:
             description,
             price,
             imagePath: filename,
-            tags: tags
+            category: category.toLowerCase()
         });
         await product.save();
 
@@ -74,11 +74,11 @@ router.put('/editProduct/:id', async (req: AuthRequest, res: Response) => {
         const product = await Product.findById(id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
-        const { name, price, description, tags } = req.body;
+        const { name, price, description, category }: { name: string; price: number; description: string; category: string } = req.body;
         product.name = name;
         product.price = price;
         product.description = description;
-        product.tags = tags.split(',').map((tag: string) => tag.trim());
+        product.category = category;
 
         await product.save();
 

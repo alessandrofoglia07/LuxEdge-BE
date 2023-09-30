@@ -18,7 +18,7 @@ export interface IProductDocument extends Document {
     description: string;
     price: number;
     imagePath: string;
-    tags: string[];
+    category: string;
     sold: number;
     available: boolean;
     reviews: Types.ObjectId[];

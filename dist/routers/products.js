@@ -68,7 +68,7 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const skip = (page - 1) * limit;
     const products = yield Product.aggregate()
         .match({
-        tags: { $in: tags },
+        category: { $in: tags },
         price: { $gte: price[0], $lte: price[1] }
     })
         .lookup({
@@ -94,7 +94,7 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         .limit(limit);
     const countObj = (yield Product.aggregate()
         .match({
-        tags: { $in: tags },
+        category: { $in: tags },
         price: { $gte: price[0], $lte: price[1] }
     })
         .count('count'))[0];

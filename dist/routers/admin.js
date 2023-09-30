@@ -28,14 +28,14 @@ router.post('/addProduct', upload.single('image'), (req, res) => __awaiter(void 
         return res.status(400).json({ message: 'Please upload a file.' });
     }
     const { filename } = req.file;
-    const { name, price, description, tags } = req.body;
+    const { name, price, description, category } = req.body;
     try {
         const product = new Product({
             name,
             description,
             price,
             imagePath: filename,
-            tags: tags
+            category: category.toLowerCase()
         });
         yield product.save();
         res.status(201).json({ message: 'Product added successfully' });
@@ -65,11 +65,11 @@ router.put('/editProduct/:id', (req, res) => __awaiter(void 0, void 0, void 0, f
         const product = yield Product.findById(id);
         if (!product)
             return res.status(404).json({ message: 'Product not found' });
-        const { name, price, description, tags } = req.body;
+        const { name, price, description, category } = req.body;
         product.name = name;
         product.price = price;
         product.description = description;
-        product.tags = tags.split(',').map((tag) => tag.trim());
+        product.category = category;
         yield product.save();
         return res.json({ message: 'Product updated successfully' });
     }

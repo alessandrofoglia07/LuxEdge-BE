@@ -68,7 +68,7 @@ router.get('/search', async (req: Request, res: Response) => {
 
     const products = await Product.aggregate()
         .match({
-            tags: { $in: tags },
+            category: { $in: tags },
             price: { $gte: price[0], $lte: price[1] }
         })
         .lookup({
@@ -96,7 +96,7 @@ router.get('/search', async (req: Request, res: Response) => {
     const countObj = (
         await Product.aggregate()
             .match({
-                tags: { $in: tags },
+                category: { $in: tags },
                 price: { $gte: price[0], $lte: price[1] }
             })
             .count('count')

@@ -27,10 +27,10 @@ const ProductSchema = new Schema({
         type: String,
         required: true
     },
-    tags: {
-        type: [String],
+    category: {
+        type: String,
         required: true,
-        default: []
+        trim: true
     },
     sold: {
         type: Number,
