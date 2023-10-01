@@ -3,9 +3,9 @@
     "parser": "@typescript-eslint/parser",
     "plugins": ["@typescript-eslint"],
     "extends": ["eslint:recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
-    "node": true,
-    "rules": {
-        "@typescript-eslint/no-explicit-any": "off"
-    },
-    "ignorePatterns": ["dist", "node_modules"]
+    "ignorePatterns": ["dist", ".eslintrc.cjs", "node_modules", "public", "*.config.js"],
+    "env": {
+        "es2022": true,
+        "node": true
+    }
 }

@@ -112,6 +112,8 @@ router.post('/refresh-token', (req, res) => __awaiter(void 0, void 0, void 0, fu
                 console.log(err);
                 return res.status(403).json({ message: 'Invalid refresh token' });
             }
+            if (!result || typeof result !== 'object' || !('userId' in result))
+                return res.status(403).json({ message: 'Invalid refresh token' });
             const userId = result.userId;
             const user = yield User.findById(userId);
             if (!user)
@@ -133,7 +135,7 @@ router.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void 0, 
         if (!user)
             return res.status(404).json({ message: 'User not found' });
         const tokenExists = yield Token.findOne({ userId: user._id });
-        if (!!tokenExists)
+        if (tokenExists)
             return res.status(409).json({ message: 'A password reset email has already been sent' });
         const token = uuidv4();
         const url = `${process.env.CLIENT_URL}/user/reset-password/${user._id}/${token}`;

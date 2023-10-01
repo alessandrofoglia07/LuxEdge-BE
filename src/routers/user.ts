@@ -114,11 +114,13 @@ router.post('/refresh-token', async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
 
     try {
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, async (err: any, result: any) => {
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, async (err: unknown, result: unknown) => {
             if (err) {
                 console.log(err);
                 return res.status(403).json({ message: 'Invalid refresh token' });
             }
+
+            if (!result || typeof result !== 'object' || !('userId' in result)) return res.status(403).json({ message: 'Invalid refresh token' });
 
             const userId = result.userId;
             const user = await User.findById(userId);
@@ -143,7 +145,7 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
         if (!user) return res.status(404).json({ message: 'User not found' });
 
         const tokenExists = await Token.findOne({ userId: user._id });
-        if (!!tokenExists) return res.status(409).json({ message: 'A password reset email has already been sent' });
+        if (tokenExists) return res.status(409).json({ message: 'A password reset email has already been sent' });
 
         const token = uuidv4();
         const url = `${process.env.CLIENT_URL}/user/reset-password/${user._id}/${token}`;
