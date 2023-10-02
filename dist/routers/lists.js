@@ -13,7 +13,7 @@ import Product from '../models/product.js';
 const router = Router();
 router.use(checkUser);
 // add to cart
-router.patch('/addToCart/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/cart/add/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
         const product = yield Product.findById(id);
@@ -30,7 +30,7 @@ router.patch('/addToCart/:id', (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 }));
 // remove from cart
-router.patch('/removeFromCart/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/cart/remove/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
         const product = yield Product.findById(id);
@@ -47,7 +47,7 @@ router.patch('/removeFromCart/:id', (req, res) => __awaiter(void 0, void 0, void
     }
 }));
 // clear cart
-router.patch('/clearCart', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/cart/clear', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = req.user;
         user.cart = [];
@@ -72,7 +72,7 @@ router.get('/cart', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 }));
 // add to favorites
-router.patch('/addToFavorites/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/favorites/add/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
         const product = yield Product.findById(id);
@@ -89,7 +89,7 @@ router.patch('/addToFavorites/:id', (req, res) => __awaiter(void 0, void 0, void
     }
 }));
 // remove from favorites
-router.patch('/removeFromFavorites/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/favorites/remove/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
         const user = req.user;

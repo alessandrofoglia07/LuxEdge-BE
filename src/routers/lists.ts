@@ -8,7 +8,7 @@ const router = Router();
 router.use(checkUser);
 
 // add to cart
-router.patch('/addToCart/:id', async (req: AuthRequest, res: Response) => {
+router.patch('/cart/add/:id', async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -28,7 +28,7 @@ router.patch('/addToCart/:id', async (req: AuthRequest, res: Response) => {
 });
 
 // remove from cart
-router.patch('/removeFromCart/:id', async (req: AuthRequest, res: Response) => {
+router.patch('/cart/remove/:id', async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -48,7 +48,7 @@ router.patch('/removeFromCart/:id', async (req: AuthRequest, res: Response) => {
 });
 
 // clear cart
-router.patch('/clearCart', async (req: AuthRequest, res: Response) => {
+router.patch('/cart/clear', async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user!;
         user.cart = [];
@@ -73,7 +73,7 @@ router.get('/cart', async (req: AuthRequest, res: Response) => {
 });
 
 // add to favorites
-router.patch('/addToFavorites/:id', async (req: AuthRequest, res: Response) => {
+router.patch('/favorites/add/:id', async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -93,7 +93,7 @@ router.patch('/addToFavorites/:id', async (req: AuthRequest, res: Response) => {
 });
 
 // remove from favorites
-router.patch('/removeFromFavorites/:id', async (req: AuthRequest, res: Response) => {
+router.patch('/favorites/remove/:id', async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     try {
