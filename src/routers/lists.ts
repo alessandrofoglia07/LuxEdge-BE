@@ -18,6 +18,7 @@ router.patch('/cart/add/:id', async (req: AuthRequest, res: Response) => {
         const user = req.user!;
 
         user.cart.push(product._id);
+        user.cart = removeDuplicates(user.cart);
         await user.save();
 
         res.json(user.cart);
@@ -38,6 +39,7 @@ router.patch('/cart/remove/:id', async (req: AuthRequest, res: Response) => {
         const user = req.user!;
 
         user.cart = user.cart.filter((productId) => productId.toString() !== product._id.toString());
+        user.cart = removeDuplicates(user.cart);
         await user.save();
 
         res.json(user.cart);
@@ -62,6 +64,20 @@ router.patch('/cart/clear', async (req: AuthRequest, res: Response) => {
 
 // get cart
 router.get('/cart', async (req: AuthRequest, res: Response) => {
+    res.redirect('/lists/cart/ids');
+});
+
+router.get('/cart/ids', async (req: AuthRequest, res: Response) => {
+    try {
+        const user = req.user!;
+        res.json(user.cart);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.get('/cart/products', async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user!;
         const cart = await Product.find({ _id: { $in: user.cart } });
@@ -71,6 +87,8 @@ router.get('/cart', async (req: AuthRequest, res: Response) => {
         return res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+const removeDuplicates = <T>(arr: T[]) => [...new Set(arr)];
 
 // add to favorites
 router.patch('/favorites/add/:id', async (req: AuthRequest, res: Response) => {
@@ -83,12 +101,32 @@ router.patch('/favorites/add/:id', async (req: AuthRequest, res: Response) => {
         const user = req.user!;
 
         user.favorites.push(product._id);
+        user.favorites = removeDuplicates(user.favorites);
         await user.save();
 
         res.json(user.favorites);
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.patch('/favorites/add-multiple', async (req: AuthRequest, res: Response) => {
+    const { ids } = req.body;
+
+    try {
+        const user = req.user!;
+
+        const products = await Product.find({ _id: { $in: ids } });
+
+        user.favorites.push(...products.map((product) => product._id));
+        user.favorites = removeDuplicates(user.favorites);
+        await user.save();
+
+        res.json(user.favorites);
+    } catch (err: unknown) {
+        console.log(err);
+        return res.sendStatus(500);
     }
 });
 
@@ -100,6 +138,7 @@ router.patch('/favorites/remove/:id', async (req: AuthRequest, res: Response) =>
         const user = req.user!;
 
         user.favorites = user.favorites.filter((productId) => productId.toString() !== id);
+        user.favorites = removeDuplicates(user.favorites);
         await user.save();
 
         res.json(user.favorites);
@@ -109,8 +148,36 @@ router.patch('/favorites/remove/:id', async (req: AuthRequest, res: Response) =>
     }
 });
 
+router.patch('/favorites/clear', async (req: AuthRequest, res: Response) => {
+    try {
+        const user = req.user!;
+        user.favorites = [];
+        await user.save();
+        res.json(user.favorites);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // get favorites
 router.get('/favorites', async (req: AuthRequest, res: Response) => {
+    res.redirect('/lists/favorites/ids');
+});
+
+/** Get user favorites ids */
+router.get('/favorites/ids', async (req: AuthRequest, res: Response) => {
+    try {
+        const user = req.user!;
+        res.json(user.favorites);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+/** Get user favorites ids */
+router.get('/favorites/products', async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user!;
         const favorites = await Product.find({ _id: { $in: user.favorites } });
