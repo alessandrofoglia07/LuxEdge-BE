@@ -162,7 +162,7 @@ router.get('/favorites/ids', (req, res) => __awaiter(void 0, void 0, void 0, fun
         return res.status(500).json({ message: 'Internal server error' });
     }
 }));
-/** Get user favorites ids */
+/** Get user favorites products */
 router.get('/favorites/products', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = req.user;

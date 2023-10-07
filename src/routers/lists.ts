@@ -176,7 +176,7 @@ router.get('/favorites/ids', async (req: AuthRequest, res: Response) => {
     }
 });
 
-/** Get user favorites ids */
+/** Get user favorites products */
 router.get('/favorites/products', async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user!;
