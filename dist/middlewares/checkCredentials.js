@@ -3,7 +3,8 @@ import { z } from 'zod';
 CustomKeywords.addKeywords(['post', 'comment', 'admin', 'administrator', 'moderator', 'user', 'users']);
 /** Check if username, email and password are valid */
 const checkCredentials = (req, res, next) => {
-    let { username, email, password } = req.body;
+    let { username } = req.body;
+    const { email, password } = req.body;
     username = username.trim();
     const userLengthErr = 'Username must be 3-20 characters long';
     const userCharsErr = 'Username cannot contain spaces or asterisks';

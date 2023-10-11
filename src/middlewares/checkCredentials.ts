@@ -6,7 +6,8 @@ CustomKeywords.addKeywords(['post', 'comment', 'admin', 'administrator', 'modera
 
 /** Check if username, email and password are valid */
 const checkCredentials = (req: Request, res: Response, next: NextFunction) => {
-    let { username, email, password } = req.body;
+    let { username } = req.body;
+    const { email, password } = req.body;
 
     username = username.trim();
 

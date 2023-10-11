@@ -1,5 +1,6 @@
 const checkAdmin = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') {
+    var _a;
+    if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === 'admin') {
         next();
     }
     else {
