@@ -18,7 +18,6 @@ router.patch('/cart/add/:id', async (req: AuthRequest, res: Response) => {
         const user = req.user!;
 
         user.cart.push(product._id);
-        user.cart = removeDuplicates(user.cart);
         await user.save();
 
         res.json(user.cart);
@@ -38,8 +37,11 @@ router.patch('/cart/remove/:id', async (req: AuthRequest, res: Response) => {
 
         const user = req.user!;
 
-        user.cart = user.cart.filter((productId) => productId.toString() !== product._id.toString());
-        user.cart = removeDuplicates(user.cart);
+        const index = user.cart.findIndex((productId) => productId.toString() === id);
+        if (index === -1) return res.sendStatus(404);
+
+        user.cart.splice(index, 1);
+
         await user.save();
 
         res.json(user.cart);
@@ -81,12 +83,41 @@ router.get('/cart/products', async (req: AuthRequest, res: Response) => {
     try {
         const user = req.user!;
         const cart = await Product.find({ _id: { $in: user.cart } });
-        res.json(cart);
+
+        const counts: Record<string, number> = {};
+        for (const productId of user.cart) {
+            if (!counts[productId.toString()]) counts[productId.toString()] = 0;
+            counts[productId.toString()]++;
+        }
+
+        const newCart = [];
+
+        for (const product of cart) {
+            if (!counts[product._id.toString()]) continue;
+            newCart.push(...Array(counts[product._id.toString()]).fill(product));
+        }
+
+        res.json(newCart);
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+// router.get('/cart/products', async (req: AuthRequest, res: Response) => {
+//     try {
+//         const user = req.user!;
+//         const cart = [];
+//         for (const productId of user.cart) {
+//             const product = await Product.findById(productId);
+//             if (product) cart.push(product);
+//         }
+//         res.json(cart);
+//     } catch (err) {
+//         console.log(err);
+//         return res.status(500).json({ message: 'Internal server error' });
+//     }
+// });
 
 const removeDuplicates = <T>(arr: T[]) => [...new Set(arr)];
 

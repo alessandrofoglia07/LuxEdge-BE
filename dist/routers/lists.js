@@ -21,7 +21,6 @@ router.patch('/cart/add/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
             return res.sendStatus(404);
         const user = req.user;
         user.cart.push(product._id);
-        user.cart = removeDuplicates(user.cart);
         yield user.save();
         res.json(user.cart);
     }
@@ -38,8 +37,10 @@ router.patch('/cart/remove/:id', (req, res) => __awaiter(void 0, void 0, void 0,
         if (!product)
             return res.sendStatus(404);
         const user = req.user;
-        user.cart = user.cart.filter((productId) => productId.toString() !== product._id.toString());
-        user.cart = removeDuplicates(user.cart);
+        const index = user.cart.findIndex((productId) => productId.toString() === id);
+        if (index === -1)
+            return res.sendStatus(404);
+        user.cart.splice(index, 1);
         yield user.save();
         res.json(user.cart);
     }
@@ -79,13 +80,39 @@ router.get('/cart/products', (req, res) => __awaiter(void 0, void 0, void 0, fun
     try {
         const user = req.user;
         const cart = yield Product.find({ _id: { $in: user.cart } });
-        res.json(cart);
+        const counts = {};
+        for (const productId of user.cart) {
+            if (!counts[productId.toString()])
+                counts[productId.toString()] = 0;
+            counts[productId.toString()]++;
+        }
+        const newCart = [];
+        for (const product of cart) {
+            if (!counts[product._id.toString()])
+                continue;
+            newCart.push(...Array(counts[product._id.toString()]).fill(product));
+        }
+        res.json(newCart);
     }
     catch (err) {
         console.log(err);
         return res.status(500).json({ message: 'Internal server error' });
     }
 }));
+// router.get('/cart/products', async (req: AuthRequest, res: Response) => {
+//     try {
+//         const user = req.user!;
+//         const cart = [];
+//         for (const productId of user.cart) {
+//             const product = await Product.findById(productId);
+//             if (product) cart.push(product);
+//         }
+//         res.json(cart);
+//     } catch (err) {
+//         console.log(err);
+//         return res.status(500).json({ message: 'Internal server error' });
+//     }
+// });
 const removeDuplicates = (arr) => [...new Set(arr)];
 // add to favorites
 router.patch('/favorites/add/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
