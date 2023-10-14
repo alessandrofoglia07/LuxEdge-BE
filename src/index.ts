@@ -7,6 +7,7 @@ import adminRouter from './routers/admin.js';
 import productsRouter from './routers/products.js';
 import listsRouter from './routers/lists.js';
 import newsletterRouter from './routers/newsletter.js';
+import reviewRouter from './routers/review.js';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/lists', listsRouter);
 app.use('/api/newsletter', newsletterRouter);
+app.use('/api/reviews', reviewRouter);
 
 const PORT = process.env.PORT || 5000;
 const MONGO = process.env.MONGODB_URI || '';

@@ -114,10 +114,18 @@ router.get('/search', async (req: Request, res: Response) => {
     });
 });
 
-// get details of a product
-router.get('/details/:id', async (req: Request, res: Response) => {
+// get details of a product from id
+router.get('/details/id/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
-    const product = await Product.findById(id).populate('reviews');
+    const product = await Product.findById(id).populate('Reviews');
+    if (!product) return res.sendStatus(404);
+    res.json(product);
+});
+
+// get details of a product from name
+router.get('/details/name/:name', async (req: Request, res: Response) => {
+    const { name } = req.params;
+    const product = await Product.findOne({ name }).populate('reviews').exec();
     if (!product) return res.sendStatus(404);
     res.json(product);
 });

@@ -65,3 +65,4 @@ router.get('/getScore/:id', (req, res) => __awaiter(void 0, void 0, void 0, func
         return res.status(500).json({ message: 'Internal server error' });
     }
 }));
+export default router;

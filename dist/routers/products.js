@@ -108,10 +108,18 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         totalPages: Math.ceil(count / limit)
     });
 }));
-// get details of a product
-router.get('/details/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// get details of a product from id
+router.get('/details/id/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const product = yield Product.findById(id).populate('reviews');
+    const product = yield Product.findById(id).populate('Reviews');
+    if (!product)
+        return res.sendStatus(404);
+    res.json(product);
+}));
+// get details of a product from name
+router.get('/details/name/:name', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name } = req.params;
+    const product = yield Product.findOne({ name }).populate('reviews').exec();
     if (!product)
         return res.sendStatus(404);
     res.json(product);
