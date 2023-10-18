@@ -43,7 +43,12 @@ router.get('/getReviews/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
         const product = yield Product.findById(id);
         if (!product)
             return res.status(404).json({ message: 'Product not found' });
-        const reviews = yield Review.find({ productId: product._id }).populate('userId', 'username');
+        const reviews = yield Review.find({ productId: product._id })
+            .populate({
+            path: 'userId',
+            select: 'username'
+        })
+            .exec();
         return res.json({ reviews });
     }
     catch (err) {

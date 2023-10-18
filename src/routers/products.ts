@@ -123,7 +123,16 @@ router.get('/search', async (req: Request, res: Response) => {
 // get details of a product from id
 router.get('/details/id/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
-    const product = await Product.findById(id).populate('reviews').populate('reviews.userId').exec();
+    const product = await Product.findById(id)
+        .populate('reviews')
+        .populate({
+            path: 'reviews',
+            populate: {
+                path: 'userId',
+                select: 'username'
+            }
+        })
+        .exec();
     if (!product) return res.sendStatus(404);
     res.json(product);
 });
@@ -131,7 +140,16 @@ router.get('/details/id/:id', async (req: Request, res: Response) => {
 // get details of a product from name
 router.get('/details/name/:name', async (req: Request, res: Response) => {
     const { name } = req.params;
-    const product = await Product.findOne({ name }).populate('reviews').populate('reviews.userId').exec();
+    const product = await Product.findOne({ name })
+        .populate('reviews')
+        .populate({
+            path: 'reviews',
+            populate: {
+                path: 'userId',
+                select: 'username'
+            }
+        })
+        .exec();
     if (!product) return res.sendStatus(404);
     res.json(product);
 });

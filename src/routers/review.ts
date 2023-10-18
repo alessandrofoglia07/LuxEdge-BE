@@ -41,7 +41,12 @@ router.get('/getReviews/:id', async (req: Request, res: Response) => {
         const product = await Product.findById(id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
-        const reviews = await Review.find({ productId: product._id }).populate('userId', 'username');
+        const reviews = await Review.find({ productId: product._id })
+            .populate({
+                path: 'userId',
+                select: 'username'
+            })
+            .exec();
         return res.json({ reviews });
     } catch (err) {
         console.log(err);

@@ -99,20 +99,6 @@ router.get('/cart/products', (req, res) => __awaiter(void 0, void 0, void 0, fun
         return res.status(500).json({ message: 'Internal server error' });
     }
 }));
-// router.get('/cart/products', async (req: AuthRequest, res: Response) => {
-//     try {
-//         const user = req.user!;
-//         const cart = [];
-//         for (const productId of user.cart) {
-//             const product = await Product.findById(productId);
-//             if (product) cart.push(product);
-//         }
-//         res.json(cart);
-//     } catch (err) {
-//         console.log(err);
-//         return res.status(500).json({ message: 'Internal server error' });
-//     }
-// });
 const removeDuplicates = (arr) => [...new Set(arr)];
 // add to favorites
 router.patch('/favorites/add/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

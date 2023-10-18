@@ -117,7 +117,16 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 // get details of a product from id
 router.get('/details/id/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const product = yield Product.findById(id).populate('reviews').populate('reviews.userId').exec();
+    const product = yield Product.findById(id)
+        .populate('reviews')
+        .populate({
+        path: 'reviews',
+        populate: {
+            path: 'userId',
+            select: 'username'
+        }
+    })
+        .exec();
     if (!product)
         return res.sendStatus(404);
     res.json(product);
@@ -125,7 +134,16 @@ router.get('/details/id/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
 // get details of a product from name
 router.get('/details/name/:name', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = req.params;
-    const product = yield Product.findOne({ name }).populate('reviews').populate('reviews.userId').exec();
+    const product = yield Product.findOne({ name })
+        .populate('reviews')
+        .populate({
+        path: 'reviews',
+        populate: {
+            path: 'userId',
+            select: 'username'
+        }
+    })
+        .exec();
     if (!product)
         return res.sendStatus(404);
     res.json(product);

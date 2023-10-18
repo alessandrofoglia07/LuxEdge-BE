@@ -104,21 +104,6 @@ router.get('/cart/products', async (req: AuthRequest, res: Response) => {
     }
 });
 
-// router.get('/cart/products', async (req: AuthRequest, res: Response) => {
-//     try {
-//         const user = req.user!;
-//         const cart = [];
-//         for (const productId of user.cart) {
-//             const product = await Product.findById(productId);
-//             if (product) cart.push(product);
-//         }
-//         res.json(cart);
-//     } catch (err) {
-//         console.log(err);
-//         return res.status(500).json({ message: 'Internal server error' });
-//     }
-// });
-
 const removeDuplicates = <T>(arr: T[]) => [...new Set(arr)];
 
 // add to favorites
