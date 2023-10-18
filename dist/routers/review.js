@@ -51,18 +51,4 @@ router.get('/getReviews/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
         return res.status(500).json({ message: 'Internal server error' });
     }
 }));
-router.get('/getScore/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    try {
-        if (!id)
-            return res.status(404).json({ message: 'Product not found' });
-        const reviews = yield Review.find({ productId: id });
-        const score = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
-        return res.json({ score });
-    }
-    catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-}));
 export default router;

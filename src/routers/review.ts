@@ -34,7 +34,7 @@ router.post('/add/:id', checkUser, checkActive, async (req: AuthRequest, res: Re
     }
 });
 
-router.get('/getReviews/:id', async (req: AuthRequest, res: Response) => {
+router.get('/getReviews/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -43,21 +43,6 @@ router.get('/getReviews/:id', async (req: AuthRequest, res: Response) => {
 
         const reviews = await Review.find({ productId: product._id }).populate('userId', 'username');
         return res.json({ reviews });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-});
-
-router.get('/getScore/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    try {
-        if (!id) return res.status(404).json({ message: 'Product not found' });
-
-        const reviews = await Review.find({ productId: id });
-        const score = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
-        return res.json({ score });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: 'Internal server error' });

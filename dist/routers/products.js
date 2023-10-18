@@ -77,6 +77,12 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         foreignField: 'productId',
         as: 'reviews'
     })
+        .lookup({
+        from: 'users',
+        localField: 'reviews.userId',
+        foreignField: '_id',
+        as: 'reviews.userId'
+    })
         .addFields({
         score: {
             $ifNull: [{ $round: [{ $avg: '$reviews.rating' }, 2] }, 0]
@@ -111,7 +117,7 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 // get details of a product from id
 router.get('/details/id/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const product = yield Product.findById(id).populate('Reviews');
+    const product = yield Product.findById(id).populate('reviews').populate('reviews.userId').exec();
     if (!product)
         return res.sendStatus(404);
     res.json(product);
@@ -119,7 +125,7 @@ router.get('/details/id/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
 // get details of a product from name
 router.get('/details/name/:name', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = req.params;
-    const product = yield Product.findOne({ name }).populate('reviews').exec();
+    const product = yield Product.findOne({ name }).populate('reviews').populate('reviews.userId').exec();
     if (!product)
         return res.sendStatus(404);
     res.json(product);

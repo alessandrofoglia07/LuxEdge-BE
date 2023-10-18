@@ -77,6 +77,12 @@ router.get('/search', async (req: Request, res: Response) => {
             foreignField: 'productId',
             as: 'reviews'
         })
+        .lookup({
+            from: 'users',
+            localField: 'reviews.userId',
+            foreignField: '_id',
+            as: 'reviews.userId'
+        })
         .addFields({
             score: {
                 $ifNull: [{ $round: [{ $avg: '$reviews.rating' }, 2] }, 0]
@@ -117,7 +123,7 @@ router.get('/search', async (req: Request, res: Response) => {
 // get details of a product from id
 router.get('/details/id/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
-    const product = await Product.findById(id).populate('Reviews');
+    const product = await Product.findById(id).populate('reviews').populate('reviews.userId').exec();
     if (!product) return res.sendStatus(404);
     res.json(product);
 });
@@ -125,7 +131,7 @@ router.get('/details/id/:id', async (req: Request, res: Response) => {
 // get details of a product from name
 router.get('/details/name/:name', async (req: Request, res: Response) => {
     const { name } = req.params;
-    const product = await Product.findOne({ name }).populate('reviews').exec();
+    const product = await Product.findOne({ name }).populate('reviews').populate('reviews.userId').exec();
     if (!product) return res.sendStatus(404);
     res.json(product);
 });
