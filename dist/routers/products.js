@@ -9,7 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Router } from 'express';
 import Product from '../models/product.js';
+import { toSingular } from '../utils/singularPlural.js';
 const router = Router();
+export const categories = ['Beds', 'Bookshelves', 'Chairs', 'Desks', 'Drawers', 'Sofas', 'Tables', 'Bedrooms', 'Living rooms'];
 // get all products / search products with query
 // query: tags, price, rating, sort, limit, page
 // sort: price_asc, price_desc, recommend, newest, oldest
@@ -47,7 +49,7 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         .map((tag) => tag.trim())
         .filter((tag) => Boolean(tag));
     if (!tags || tags.length === 0) {
-        tags = ['bedroom', 'bed', 'bookshelf', 'chair', 'desk', 'drawer', 'livingroom', 'sofa', 'table'];
+        tags = categories.map((category) => toSingular(category.toLowerCase().replace(/[^a-z]/g, '')));
     }
     // e.g. price=0,100 => price = [0, 100] (price >= 0 && price <= 100)
     const price = priceQuery

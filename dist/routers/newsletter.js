@@ -14,6 +14,7 @@ import Product from '../models/product.js';
 import User from '../models/user.js';
 import * as cron from 'node-cron';
 import { z } from 'zod';
+import { toPlural } from '../utils/singularPlural.js';
 const router = Router();
 // Subscribe
 router.post('/subscribe', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -80,7 +81,7 @@ const sendProductOfTheWeek = () => __awaiter(void 0, void 0, void 0, function* (
         text: `This week's product of the week is the ${product.name}!`,
         imgSrc: `${process.env.BASE_URL}/products/${product.imagePath}`,
         link: {
-            href: `${process.env.CLIENT_URL}/products/details/${product.name}`,
+            href: `${process.env.CLIENT_URL}/products/details/${toPlural(product.category)}/${product.name}`,
             text: 'Check it out here!'
         }
     };
@@ -95,7 +96,7 @@ export const sendNewProduct = (productId) => __awaiter(void 0, void 0, void 0, f
         text: `The brand new ${product.name} is now available in LuxEdge store! Check it out!`,
         imgSrc: `${process.env.BASE_URL}/products/${product.imagePath}`,
         link: {
-            href: `${process.env.CLIENT_URL}/products/details/${product.name}`,
+            href: `${process.env.CLIENT_URL}/products/details/${toPlural(product.category)}/${product.name}`,
             text: product.name
         }
     };

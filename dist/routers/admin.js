@@ -14,6 +14,7 @@ import checkAdmin from '../middlewares/checkAdmin.js';
 import Product from '../models/product.js';
 import { sendNewProduct } from './newsletter.js';
 import multer from 'multer';
+import { categories } from './products.js';
 const router = Router();
 router.use([checkUser, checkActive, checkAdmin]);
 const upload = multer({
@@ -29,6 +30,9 @@ router.post('/addProduct', upload.single('image'), (req, res) => __awaiter(void 
     }
     const { filename } = req.file;
     const { name, price, description, category } = req.body;
+    if (!categories.includes(category.toLowerCase().replace(/[^a-z]/g, ''))) {
+        return res.status(400).json({ message: 'Invalid category' });
+    }
     try {
         const product = new Product({
             name,
@@ -66,6 +70,9 @@ router.put('/editProduct/:id', (req, res) => __awaiter(void 0, void 0, void 0, f
         if (!product)
             return res.status(404).json({ message: 'Product not found' });
         const { name, price, description, category } = req.body;
+        if (!categories.includes(category.toLowerCase().replace(/[^a-z]/g, ''))) {
+            return res.status(400).json({ message: 'Invalid category' });
+        }
         product.name = name;
         product.price = price;
         product.description = description;

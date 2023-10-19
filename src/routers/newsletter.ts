@@ -6,6 +6,7 @@ import { HTMLEmailOptions, IProductDocument } from '../types.js';
 import User from '../models/user.js';
 import * as cron from 'node-cron';
 import { z } from 'zod';
+import { toPlural } from '../utils/singularPlural.js';
 
 const router = Router();
 
@@ -96,7 +97,7 @@ const sendProductOfTheWeek = async () => {
         text: `This week's product of the week is the ${product.name}!`,
         imgSrc: `${process.env.BASE_URL}/products/${product.imagePath}`,
         link: {
-            href: `${process.env.CLIENT_URL}/products/details/${product.name}`,
+            href: `${process.env.CLIENT_URL}/products/details/${toPlural(product.category)}/${product.name}`,
             text: 'Check it out here!'
         }
     };
@@ -115,7 +116,7 @@ export const sendNewProduct = async (productId: string) => {
         text: `The brand new ${product.name} is now available in LuxEdge store! Check it out!`,
         imgSrc: `${process.env.BASE_URL}/products/${product.imagePath}`,
         link: {
-            href: `${process.env.CLIENT_URL}/products/details/${product.name}`,
+            href: `${process.env.CLIENT_URL}/products/details/${toPlural(product.category)}/${product.name}`,
             text: product.name
         }
     };

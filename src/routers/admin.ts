@@ -6,6 +6,7 @@ import { AuthRequest } from '../types.js';
 import Product from '../models/product.js';
 import { sendNewProduct } from './newsletter.js';
 import multer from 'multer';
+import { categories } from './products.js';
 
 const router = Router();
 
@@ -33,6 +34,10 @@ router.post('/addProduct', upload.single('image'), async (req: AuthRequest, res:
 
     const { filename } = req.file;
     const { name, price, description, category }: ProductData = req.body;
+
+    if (!categories.includes(category.toLowerCase().replace(/[^a-z]/g, ''))) {
+        return res.status(400).json({ message: 'Invalid category' });
+    }
 
     try {
         const product = new Product({
@@ -75,6 +80,11 @@ router.put('/editProduct/:id', async (req: AuthRequest, res: Response) => {
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
         const { name, price, description, category }: { name: string; price: number; description: string; category: string } = req.body;
+
+        if (!categories.includes(category.toLowerCase().replace(/[^a-z]/g, ''))) {
+            return res.status(400).json({ message: 'Invalid category' });
+        }
+
         product.name = name;
         product.price = price;
         product.description = description;
