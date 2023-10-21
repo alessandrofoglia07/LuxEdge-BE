@@ -32,8 +32,11 @@ const sendEmail = (email, subject, htmlOptions) => __awaiter(void 0, void 0, voi
         });
         const template = yield readFile(templatePath, 'utf-8');
         const $ = cheerio.load(template);
-        const { text, imgSrc, link, user } = htmlOptions;
-        $('p#greeting').text(`Hi ${user.username},`);
+        const { text, imgSrc, link, user, important } = htmlOptions;
+        if (!user.subscribed && !important)
+            return;
+        $('#title').text(subject);
+        $('p#greeting').text(`Hi ${user.email.substring(0, email.indexOf('@'))},`);
         $('p#text').text(text);
         if (imgSrc) {
             $('img#optional-img').attr('src', imgSrc).removeAttr('style');

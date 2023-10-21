@@ -49,16 +49,27 @@ export interface ITokenDocument extends Document {
 
 export interface INewsletterSubscriberDocument extends Document {
     email: string;
+    subscribed: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
 
 export type HTMLEmailOptions = {
-    user: IUserDocument;
+    user: INewsletterSubscriberDocument;
     text: string;
     imgSrc?: string;
     link?: {
         href: string;
         text: string;
     };
+    important?: boolean;
 };
+
+export interface NewsletterOptions {
+    text: string;
+    imgSrc?: string | undefined;
+    link?: {
+        href: string;
+        text: string;
+    };
+}

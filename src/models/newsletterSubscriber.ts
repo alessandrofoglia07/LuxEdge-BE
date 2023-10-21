@@ -9,6 +9,10 @@ const NewsletterSubscriberSchema = new Schema<INewsletterSubscriberDocument>(
             unique: true,
             maxlength: 320,
             lowercase: true
+        },
+        subscribed: {
+            type: Boolean,
+            default: true
         }
     },
     { timestamps: true }

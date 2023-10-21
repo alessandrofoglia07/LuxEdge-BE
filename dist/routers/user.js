@@ -16,6 +16,7 @@ import { generateAccessToken, generateRefreshToken } from '../utils/auth.js';
 import sendEmail from '../utils/sendEmail.js';
 import { v4 as uuidv4 } from 'uuid';
 import Token from '../models/token.js';
+import NewsletterSubscriber from '../models/newsletterSubscriber.js';
 const router = Router();
 // Register
 router.post('/register', checkCredentials, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -38,6 +39,8 @@ router.post('/register', checkCredentials, (req, res) => __awaiter(void 0, void 
             active: false
         });
         yield user.save();
+        const newsletter = new NewsletterSubscriber({ email: email });
+        yield newsletter.save();
         res.status(201).json({ message: 'User registered. An email has been sent to activate your account.' });
         const text = 'Please click on the link below to activate your account.';
         const link = {
@@ -45,9 +48,10 @@ router.post('/register', checkCredentials, (req, res) => __awaiter(void 0, void 
             text: 'Activate account'
         };
         const HTMLOptions = {
-            user,
+            user: newsletter,
             text,
-            link
+            link,
+            important: true
         };
         yield sendEmail(email, 'LuxEdge - Activate Account', HTMLOptions);
     }
@@ -68,9 +72,13 @@ router.post('/activate/:userId', (req, res) => __awaiter(void 0, void 0, void 0,
         user.active = true;
         yield user.save();
         res.json({ message: 'Account activated' });
+        const newsletter = yield NewsletterSubscriber.findOne({ email: user.email });
+        if (!newsletter)
+            return;
         const HTMLEmailOptions = {
-            user,
-            text: 'Your account has been successfully activated and you are now all set to start shopping!'
+            user: newsletter,
+            text: 'Your account has been successfully activated and you are now all set to start shopping!',
+            important: true
         };
         yield sendEmail(user.email, 'LuxEdge - Confirmation email', HTMLEmailOptions);
     }
@@ -139,17 +147,21 @@ router.post('/forgot-password', (req, res) => __awaiter(void 0, void 0, void 0, 
             return res.status(409).json({ message: 'A password reset email has already been sent' });
         const token = uuidv4();
         const url = `${process.env.CLIENT_URL}/user/reset-password/${user._id}/${token}`;
+        const newsletter = yield NewsletterSubscriber.findOne({ email: user.email });
+        if (!newsletter)
+            throw new Error('Newsletter subscriber not found');
         yield new Token({
             userId: user._id,
             token: token
         }).save();
         const HTMLEmailOptions = {
-            user,
+            user: newsletter,
             text: 'Please click on the link below to reset your password. If you did not request this, please ignore this email.',
             link: {
                 href: url,
                 text: 'Reset password'
-            }
+            },
+            important: true
         };
         yield sendEmail(email, 'LuxEdge - Reset Password', HTMLEmailOptions);
         res.json({ message: 'Email sent' });

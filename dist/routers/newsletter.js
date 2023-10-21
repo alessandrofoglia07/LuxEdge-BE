@@ -11,7 +11,6 @@ import { Router } from 'express';
 import NewsletterSubscriber from '../models/newsletterSubscriber.js';
 import sendEmail from '../utils/sendEmail.js';
 import Product from '../models/product.js';
-import User from '../models/user.js';
 import * as cron from 'node-cron';
 import { z } from 'zod';
 import { toPlural } from '../utils/singularPlural.js';
@@ -27,8 +26,13 @@ router.post('/subscribe', (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
     try {
         const subscriber = yield NewsletterSubscriber.findOne({ email });
-        if (subscriber)
+        if (subscriber && subscriber.subscribed)
             return res.sendStatus(409);
+        if (subscriber && !subscriber.subscribed) {
+            subscriber.subscribed = true;
+            yield subscriber.save();
+            return res.sendStatus(200);
+        }
         const newSubscriber = new NewsletterSubscriber({ email });
         yield newSubscriber.save();
         return res.sendStatus(201);
@@ -38,15 +42,35 @@ router.post('/subscribe', (req, res) => __awaiter(void 0, void 0, void 0, functi
         return res.sendStatus(500);
     }
 }));
-// Unsubscribe
-router.post('/unsubscribe/:email', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.params;
+router.post('/resubscribe/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
     try {
-        const subscriber = NewsletterSubscriber.findOne({ email });
+        const subscriber = yield NewsletterSubscriber.findById(id);
         if (!subscriber)
             return res.sendStatus(404);
-        yield subscriber.deleteOne();
+        subscriber.subscribed = true;
+        yield subscriber.save();
         return res.sendStatus(200);
+    }
+    catch (err) {
+        console.log(err);
+        return res.sendStatus(500);
+    }
+}));
+// Unsubscribe
+router.post('/unsubscribe/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    try {
+        const subscriber = yield NewsletterSubscriber.findById(id);
+        if (!subscriber)
+            return res.sendStatus(404);
+        subscriber.subscribed = false;
+        yield subscriber.save();
+        res.sendStatus(200);
+        setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
+            const subscriber = yield NewsletterSubscriber.findById(id);
+            yield (subscriber === null || subscriber === void 0 ? void 0 : subscriber.deleteOne());
+        }), 1000 * 60 * 60 * 24 * 7);
     }
     catch (err) {
         console.log(err);
@@ -64,7 +88,9 @@ const sendNewsletter = (title, NewsletterOptions) => __awaiter(void 0, void 0, v
         const end = Math.min(start + batchSize, totalSubscribers);
         const batchEmails = subscribers.slice(start, end).map((subscriber) => subscriber.email);
         yield Promise.all(batchEmails.map((email) => __awaiter(void 0, void 0, void 0, function* () {
-            const user = (yield User.findOne({ email })) || new User({ username: email, email, password: '' });
+            const user = yield NewsletterSubscriber.findOne({ email });
+            if (!user)
+                return;
             const HTMLOptions = {
                 user,
                 text: NewsletterOptions.text,
@@ -79,9 +105,9 @@ const sendProductOfTheWeek = () => __awaiter(void 0, void 0, void 0, function* (
     const product = (yield Product.aggregate([{ $sample: { size: 1 } }]))[0];
     const NewsletterOptions = {
         text: `This week's product of the week is the ${product.name}!`,
-        imgSrc: `${process.env.BASE_URL}/products/${product.imagePath}`,
+        imgSrc: `${process.env.MEDIA_URL}/${product.imagePath}`,
         link: {
-            href: `${process.env.CLIENT_URL}/products/details/${toPlural(product.category)}/${product.name}`,
+            href: `${process.env.CLIENT_URL}/products/${toPlural(product.category)}/${product.name}`,
             text: 'Check it out here!'
         }
     };
@@ -94,9 +120,9 @@ export const sendNewProduct = (productId) => __awaiter(void 0, void 0, void 0, f
         return;
     const NewsletterOptions = {
         text: `The brand new ${product.name} is now available in LuxEdge store! Check it out!`,
-        imgSrc: `${process.env.BASE_URL}/products/${product.imagePath}`,
+        imgSrc: `${process.env.MEDIA_URL}/${product.imagePath}`,
         link: {
-            href: `${process.env.CLIENT_URL}/products/details/${toPlural(product.category)}/${product.name}`,
+            href: `${process.env.CLIENT_URL}/products/${toPlural(product.category)}/${product.name}`,
             text: product.name
         }
     };

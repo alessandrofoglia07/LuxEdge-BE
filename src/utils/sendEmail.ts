@@ -30,9 +30,13 @@ const sendEmail = async (email: string, subject: string, htmlOptions: HTMLEmailO
 
         const $ = cheerio.load(template);
 
-        const { text, imgSrc, link, user } = htmlOptions;
+        const { text, imgSrc, link, user, important } = htmlOptions;
 
-        $('p#greeting').text(`Hi ${user.username},`);
+        if (!user.subscribed && !important) return;
+
+        $('#title').text(subject);
+
+        $('p#greeting').text(`Hi ${user.email.substring(0, email.indexOf('@'))},`);
 
         $('p#text').text(text);
 

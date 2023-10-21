@@ -2,8 +2,7 @@ import { Router, Request, Response } from 'express';
 import NewsletterSubscriber from '../models/newsletterSubscriber.js';
 import sendEmail from '../utils/sendEmail.js';
 import Product from '../models/product.js';
-import { HTMLEmailOptions, IProductDocument } from '../types.js';
-import User from '../models/user.js';
+import { HTMLEmailOptions, IProductDocument, NewsletterOptions } from '../types.js';
 import * as cron from 'node-cron';
 import { z } from 'zod';
 import { toPlural } from '../utils/singularPlural.js';
@@ -23,7 +22,13 @@ router.post('/subscribe', async (req: Request, res: Response) => {
     try {
         const subscriber = await NewsletterSubscriber.findOne({ email });
 
-        if (subscriber) return res.sendStatus(409);
+        if (subscriber && subscriber.subscribed) return res.sendStatus(409);
+
+        if (subscriber && !subscriber.subscribed) {
+            subscriber.subscribed = true;
+            await subscriber.save();
+            return res.sendStatus(200);
+        }
 
         const newSubscriber = new NewsletterSubscriber({ email });
         await newSubscriber.save();
@@ -34,16 +39,17 @@ router.post('/subscribe', async (req: Request, res: Response) => {
     }
 });
 
-// Unsubscribe
-router.post('/unsubscribe/:email', async (req: Request, res: Response) => {
-    const { email } = req.params;
+router.post('/resubscribe/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
 
     try {
-        const subscriber = NewsletterSubscriber.findOne({ email });
+        const subscriber = await NewsletterSubscriber.findById(id);
 
         if (!subscriber) return res.sendStatus(404);
 
-        await subscriber.deleteOne();
+        subscriber.subscribed = true;
+
+        await subscriber.save();
 
         return res.sendStatus(200);
     } catch (err: unknown) {
@@ -52,14 +58,30 @@ router.post('/unsubscribe/:email', async (req: Request, res: Response) => {
     }
 });
 
-interface NewsletterOptions {
-    text: string;
-    imgSrc?: string | undefined;
-    link?: {
-        href: string;
-        text: string;
-    };
-}
+// Unsubscribe
+router.post('/unsubscribe/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const subscriber = await NewsletterSubscriber.findById(id);
+
+        if (!subscriber) return res.sendStatus(404);
+
+        subscriber.subscribed = false;
+
+        await subscriber.save();
+
+        res.sendStatus(200);
+
+        setTimeout(async () => {
+            const subscriber = await NewsletterSubscriber.findById(id);
+            await subscriber?.deleteOne();
+        }, 1000 * 60 * 60 * 24 * 7);
+    } catch (err: unknown) {
+        console.log(err);
+        return res.sendStatus(500);
+    }
+});
 
 /** Send newsletter email to all the subscribers (10 emails at a time) */
 const sendNewsletter = async (title: string, NewsletterOptions: NewsletterOptions) => {
@@ -77,7 +99,8 @@ const sendNewsletter = async (title: string, NewsletterOptions: NewsletterOption
 
         await Promise.all(
             batchEmails.map(async (email) => {
-                const user = (await User.findOne({ email })) || new User({ username: email, email, password: '' });
+                const user = await NewsletterSubscriber.findOne({ email });
+                if (!user) return;
                 const HTMLOptions: HTMLEmailOptions = {
                     user,
                     text: NewsletterOptions.text,
@@ -95,9 +118,9 @@ const sendProductOfTheWeek = async () => {
 
     const NewsletterOptions: NewsletterOptions = {
         text: `This week's product of the week is the ${product.name}!`,
-        imgSrc: `${process.env.BASE_URL}/products/${product.imagePath}`,
+        imgSrc: `${process.env.MEDIA_URL}/${product.imagePath}`,
         link: {
-            href: `${process.env.CLIENT_URL}/products/details/${toPlural(product.category)}/${product.name}`,
+            href: `${process.env.CLIENT_URL}/products/${toPlural(product.category)}/${product.name}`,
             text: 'Check it out here!'
         }
     };
@@ -114,9 +137,9 @@ export const sendNewProduct = async (productId: string) => {
 
     const NewsletterOptions: NewsletterOptions = {
         text: `The brand new ${product.name} is now available in LuxEdge store! Check it out!`,
-        imgSrc: `${process.env.BASE_URL}/products/${product.imagePath}`,
+        imgSrc: `${process.env.MEDIA_URL}/${product.imagePath}`,
         link: {
-            href: `${process.env.CLIENT_URL}/products/details/${toPlural(product.category)}/${product.name}`,
+            href: `${process.env.CLIENT_URL}/products/${toPlural(product.category)}/${product.name}`,
             text: product.name
         }
     };

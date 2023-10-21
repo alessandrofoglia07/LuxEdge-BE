@@ -6,6 +6,10 @@ const NewsletterSubscriberSchema = new Schema({
         unique: true,
         maxlength: 320,
         lowercase: true
+    },
+    subscribed: {
+        type: Boolean,
+        default: true
     }
 }, { timestamps: true });
 export default model('NewsletterSubscriber', NewsletterSubscriberSchema);
