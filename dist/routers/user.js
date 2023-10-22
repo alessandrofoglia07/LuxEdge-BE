@@ -179,8 +179,10 @@ router.post('/reset-password/:userId/:token', (req, res) => __awaiter(void 0, vo
         const result = yield Token.findOne({ userId: userId, token: token });
         if (!result)
             return res.status(404).json({ message: 'Invalid token' });
-        if (result.expiresAt.getTime() < Date.now())
+        if (result.expiresAt.getTime() < Date.now()) {
+            yield result.deleteOne();
             return res.status(403).json({ message: 'Token expired' });
+        }
         const user = yield User.findById(userId);
         if (!user)
             return res.status(404).json({ message: 'User not found' });

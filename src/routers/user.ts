@@ -195,7 +195,10 @@ router.post('/reset-password/:userId/:token', async (req: Request, res: Response
     try {
         const result = await Token.findOne({ userId: userId, token: token });
         if (!result) return res.status(404).json({ message: 'Invalid token' });
-        if (result.expiresAt.getTime() < Date.now()) return res.status(403).json({ message: 'Token expired' });
+        if (result.expiresAt.getTime() < Date.now()) {
+            await result.deleteOne();
+            return res.status(403).json({ message: 'Token expired' });
+        }
 
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
