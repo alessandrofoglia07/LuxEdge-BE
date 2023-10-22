@@ -38,6 +38,7 @@ const sendEmail = (email, subject, htmlOptions) => __awaiter(void 0, void 0, voi
         $('#title').text(subject);
         $('p#greeting').text(`Hi ${user.email.substring(0, email.indexOf('@'))},`);
         $('p#text').text(text);
+        $('span#year').text(new Date().getFullYear().toString());
         if (imgSrc) {
             $('img#optional-img').attr('src', imgSrc).removeAttr('style');
         }

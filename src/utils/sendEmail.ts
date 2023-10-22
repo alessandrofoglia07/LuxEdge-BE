@@ -40,6 +40,8 @@ const sendEmail = async (email: string, subject: string, htmlOptions: HTMLEmailO
 
         $('p#text').text(text);
 
+        $('span#year').text(new Date().getFullYear().toString());
+
         if (imgSrc) {
             $('img#optional-img').attr('src', imgSrc).removeAttr('style');
         }
