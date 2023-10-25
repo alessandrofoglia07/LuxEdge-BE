@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { connect } from 'mongoose';
 import userRouter from './routers/user.js';
@@ -22,6 +23,8 @@ const app = express();
 app.use(cors({
     origin: process.env.CLIENT_URL
 }));
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(express.json());
 app.use('/api/user', userRouter);
 app.use('/api/admin', adminRouter);
