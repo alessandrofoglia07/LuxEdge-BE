@@ -29,7 +29,7 @@ export interface IProductDocument extends Document {
 
 export interface IReviewDocument extends Document {
     productId: Types.ObjectId;
-    userId: Types.ObjectId;
+    user: Types.ObjectId;
     rating: number;
     comment: string;
     createdAt: Date;

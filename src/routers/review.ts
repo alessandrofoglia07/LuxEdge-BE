@@ -18,7 +18,7 @@ router.post('/add/:id', checkUser, checkActive, async (req: AuthRequest, res: Re
 
         const review = new Review({
             productId: product._id,
-            userId: user._id,
+            user: user._id,
             rating,
             comment
         });
@@ -43,7 +43,7 @@ router.get('/getReviews/:id', async (req: Request, res: Response) => {
 
         const reviews = await Review.find({ productId: product._id })
             .populate({
-                path: 'userId',
+                path: 'user',
                 select: 'username'
             })
             .exec();

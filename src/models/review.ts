@@ -8,7 +8,7 @@ const ReviewSchema = new Schema<IReviewDocument>(
             ref: 'Product',
             required: true
         },
-        userId: {
+        user: {
             type: SchemaTypes.ObjectId,
             ref: 'User',
             required: true

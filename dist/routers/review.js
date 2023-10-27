@@ -23,7 +23,7 @@ router.post('/add/:id', checkUser, checkActive, (req, res) => __awaiter(void 0, 
             return res.status(404).json({ message: 'Product not found' });
         const review = new Review({
             productId: product._id,
-            userId: user._id,
+            user: user._id,
             rating,
             comment
         });
@@ -45,7 +45,7 @@ router.get('/getReviews/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
             return res.status(404).json({ message: 'Product not found' });
         const reviews = yield Review.find({ productId: product._id })
             .populate({
-            path: 'userId',
+            path: 'user',
             select: 'username'
         })
             .exec();

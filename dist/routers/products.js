@@ -81,9 +81,9 @@ router.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     })
         .lookup({
         from: 'users',
-        localField: 'reviews.userId',
+        localField: 'reviews.user',
         foreignField: '_id',
-        as: 'reviews.userId'
+        as: 'reviews.user'
     })
         .addFields({
         score: {
@@ -124,7 +124,7 @@ router.get('/details/id/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
         .populate({
         path: 'reviews',
         populate: {
-            path: 'userId',
+            path: 'user',
             select: 'username'
         }
     })
@@ -141,7 +141,7 @@ router.get('/details/name/:name', (req, res) => __awaiter(void 0, void 0, void 0
         .populate({
         path: 'reviews',
         populate: {
-            path: 'userId',
+            path: 'user',
             select: 'username'
         }
     })
