@@ -37,7 +37,7 @@ router.post('/add/:id', checkUser, checkActive, (req, res) => __awaiter(void 0, 
         return res.status(500).json({ message: 'Internal server error' });
     }
 }));
-router.get('/getReviews/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/get-reviews/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
         const product = yield Product.findById(id);
@@ -50,6 +50,43 @@ router.get('/getReviews/:id', (req, res) => __awaiter(void 0, void 0, void 0, fu
         })
             .exec();
         return res.json({ reviews });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}));
+router.patch('/edit/:id', checkUser, checkActive, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+    const user = req.user;
+    try {
+        const review = yield Review.findById(id);
+        if (!review)
+            return res.status(404).json({ message: 'Review not found' });
+        if (review.user.toString() !== user._id.toString())
+            return res.status(403).json({ message: 'Forbidden' });
+        review.rating = rating;
+        review.comment = comment;
+        yield review.save();
+        return res.json({ message: 'Review updated successfully' });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}));
+router.delete('/delete/:id', checkUser, checkActive, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const user = req.user;
+    try {
+        const review = yield Review.findById(id);
+        if (!review)
+            return res.status(404).json({ message: 'Review not found' });
+        if (review.user.toString() !== user._id.toString())
+            return res.status(403).json({ message: 'Forbidden' });
+        yield review.deleteOne();
+        return res.json({ message: 'Review deleted successfully' });
     }
     catch (err) {
         console.log(err);

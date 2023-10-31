@@ -34,7 +34,7 @@ router.post('/add/:id', checkUser, checkActive, async (req: AuthRequest, res: Re
     }
 });
 
-router.get('/getReviews/:id', async (req: Request, res: Response) => {
+router.get('/get-reviews/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -48,6 +48,48 @@ router.get('/getReviews/:id', async (req: Request, res: Response) => {
             })
             .exec();
         return res.json({ reviews });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.patch('/edit/:id', checkUser, checkActive, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+    const user = req.user!;
+
+    try {
+        const review = await Review.findById(id);
+        if (!review) return res.status(404).json({ message: 'Review not found' });
+
+        if (review.user.toString() !== user._id.toString()) return res.status(403).json({ message: 'Forbidden' });
+
+        review.rating = rating;
+        review.comment = comment;
+
+        await review.save();
+
+        return res.json({ message: 'Review updated successfully' });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.delete('/delete/:id', checkUser, checkActive, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const user = req.user!;
+
+    try {
+        const review = await Review.findById(id);
+        if (!review) return res.status(404).json({ message: 'Review not found' });
+
+        if (review.user.toString() !== user._id.toString()) return res.status(403).json({ message: 'Forbidden' });
+
+        await review.deleteOne();
+
+        return res.json({ message: 'Review deleted successfully' });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: 'Internal server error' });
