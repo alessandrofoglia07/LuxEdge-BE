@@ -18,6 +18,7 @@ import productsRouter from './routers/products.js';
 import listsRouter from './routers/lists.js';
 import newsletterRouter from './routers/newsletter.js';
 import reviewRouter from './routers/review.js';
+import paymentRouter from './routers/payment.js';
 dotenv.config();
 const app = express();
 app.use(cors({
@@ -32,6 +33,7 @@ app.use('/api/products', productsRouter);
 app.use('/api/lists', listsRouter);
 app.use('/api/newsletter', newsletterRouter);
 app.use('/api/reviews', reviewRouter);
+app.use('/api/payment', paymentRouter);
 const PORT = process.env.PORT || 5000;
 const MONGO = process.env.MONGODB_URI || '';
 await (() => __awaiter(void 0, void 0, void 0, function* () {

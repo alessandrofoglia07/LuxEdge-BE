@@ -73,3 +73,14 @@ export interface NewsletterOptions {
         text: string;
     };
 }
+
+export interface IOrderDocument extends Document {
+    sessionId: string;
+    user: Types.ObjectId;
+    products: Types.ObjectId[];
+    totalPrice: number;
+    paymentStatus: 'pending' | 'completed' | 'failed';
+    paymentType: 'card' | 'paypal';
+    createdAt: Date;
+    updatedAt: Date;
+}
