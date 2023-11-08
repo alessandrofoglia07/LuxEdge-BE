@@ -55,7 +55,7 @@ router.post('/create-checkout-session', async (req: AuthRequest, res: Response) 
             payment_method_types: ['card', 'paypal'],
             mode: 'payment',
             success_url: `${process.env.CLIENT_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.CLIENT_URL}/checkout/canceled`,
+            cancel_url: `${process.env.CLIENT_URL}/checkout/cancel`,
             line_items: items
         });
 
@@ -76,7 +76,7 @@ router.post('/create-checkout-session', async (req: AuthRequest, res: Response) 
     }
 });
 
-router.post('/success', async (req: AuthRequest, res: Response) => {
+router.post('/confirm', async (req: AuthRequest, res: Response) => {
     const { session_id } = req.query;
     const user = req.user!;
 
@@ -88,6 +88,8 @@ router.post('/success', async (req: AuthRequest, res: Response) => {
         if (session.payment_status === 'paid') {
             const order = await Order.findOne({ sessionId: session.id });
             if (!order) throw new Error('Order not found');
+
+            if (order.paymentStatus === 'completed') return res.json({ message: 'Payment already completed' });
 
             order.paymentStatus = 'completed';
             await order.save();
