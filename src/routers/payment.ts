@@ -99,6 +99,8 @@ router.post('/confirm', async (req: AuthRequest, res: Response) => {
 
             res.json({ message: 'Payment successful' });
 
+            if (!session.customer_email) return;
+
             const newsletterUser = await NewsletterSubscriber.findOne({ email: user.email });
             if (!newsletterUser) throw new Error('Newsletter subscriber not found');
 
@@ -111,7 +113,7 @@ router.post('/confirm', async (req: AuthRequest, res: Response) => {
                     text: 'View order'
                 }
             };
-            await sendEmail(session.customer_email!, 'Thank you for your purchase!', email);
+            await sendEmail(session.customer_email, 'Thank you for your purchase!', email);
         } else {
             const order = await Order.findOne({ sessionId: session.id });
             if (!order) throw new Error('Order not found');
