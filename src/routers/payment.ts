@@ -41,7 +41,7 @@ router.post('/create-checkout-session', async (req: AuthRequest, res: Response) 
                     product_data: {
                         name: product.name,
                         description: product.description,
-                        images: [`${process.env.BASE_URL}/products/${product.imagePath}`]
+                        images: [`${process.env.MEDIA_URL}/${product.imagePath}`]
                     },
                     unit_amount: product.price * 100
                 },
@@ -55,7 +55,7 @@ router.post('/create-checkout-session', async (req: AuthRequest, res: Response) 
             payment_method_types: ['card', 'paypal'],
             mode: 'payment',
             success_url: `${process.env.CLIENT_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.CLIENT_URL}/checkout/cancel`,
+            cancel_url: `${process.env.CLIENT_URL}/checkout/cancel?session_id={CHECKOUT_SESSION_ID}`,
             line_items: items
         });
 
@@ -123,6 +123,25 @@ router.post('/confirm', async (req: AuthRequest, res: Response) => {
 
             res.status(400).json({ message: 'Payment failed' });
         }
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.delete('/cancel', async (req: AuthRequest, res: Response) => {
+    const { session_id } = req.query;
+
+    if (!session_id || typeof session_id !== 'string') return res.sendStatus(400);
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(session_id);
+
+        if (session.payment_status === 'paid') return res.json({ message: 'Payment already completed' });
+
+        await Order.deleteOne({ sessionId: session.id });
+
+        res.json({ message: 'Payment cancelled' });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: 'Internal server error' });
