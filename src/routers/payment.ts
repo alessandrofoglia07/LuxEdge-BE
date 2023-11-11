@@ -148,4 +148,17 @@ router.delete('/cancel', async (req: AuthRequest, res: Response) => {
     }
 });
 
+router.get('/orders', async (req: AuthRequest, res: Response) => {
+    const user = req.user!;
+
+    try {
+        const orders = await Order.find({ user: user._id });
+
+        res.json(orders);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 export default router;
