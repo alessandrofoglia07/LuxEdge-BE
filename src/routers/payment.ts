@@ -161,4 +161,20 @@ router.get('/orders', async (req: AuthRequest, res: Response) => {
     }
 });
 
+router.get('/orders/:id', async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const user = req.user!;
+
+    try {
+        const order = await Order.findOne({ _id: id, user: user._id }).populate('products');
+
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+
+        res.json(order);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 export default router;
