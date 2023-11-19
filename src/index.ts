@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { connect } from 'mongoose';
+import mongoSanitize from 'express-mongo-sanitize';
+import { rateLimit } from 'express-rate-limit';
 import userRouter from './routers/user.js';
 import adminRouter from './routers/admin.js';
 import productsRouter from './routers/products.js';
@@ -15,6 +17,12 @@ dotenv.config();
 
 const app = express();
 
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 500,
+    message: 'Too many requests from this IP, please try again later.'
+});
+
 app.use(
     cors({
         origin: process.env.CLIENT_URL
@@ -22,6 +30,8 @@ app.use(
 );
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
+app.use(mongoSanitize());
+app.use(limiter);
 app.use(express.json());
 
 app.use('/api/user', userRouter);
