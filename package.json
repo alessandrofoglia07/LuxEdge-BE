@@ -1,7 +1,9 @@
 {
     "name": "backend",
     "version": "1.0.0",
-    "description": "",
+    "author": "alessandrofoglia07",
+    "description": "LuxEdge is a furniture e-commerce made with React.js and Node.js.",
+    "license": "MIT",
     "main": "index.js",
     "scripts": {
         "build": "tsc -p .",
@@ -10,9 +12,6 @@
         "dev": "concurrently npm:dev:*",
         "start": "node dist/index.js"
     },
-    "keywords": [],
-    "author": "alessandrofoglia07",
-    "license": "MIT",
     "dependencies": {
         "bcrypt": "^5.1.1",
         "cheerio": "1.0.0-rc.12",
